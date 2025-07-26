@@ -34,6 +34,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { generateItinerary, reviseItinerary } from '@/app/actions';
 import { ScrollArea } from '../ui/scroll-area';
+import { ItineraryTable } from './ItineraryTable';
+import type { ItineraryItem } from '@/lib/types';
 
 const formSchema = z.object({
   city: z.string().min(2, {
@@ -50,7 +52,7 @@ type FormData = z.infer<typeof formSchema>;
 export default function ItineraryGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRevising, setIsRevising] = useState(false);
-  const [itinerary, setItinerary] = useState<string | null>(null);
+  const [itinerary, setItinerary] = useState<ItineraryItem[] | null>(null);
   const [formValues, setFormValues] = useState<FormData | null>(null);
   const { toast } = useToast();
 
@@ -88,7 +90,7 @@ export default function ItineraryGenerator() {
     const result = await reviseItinerary({
       city: formValues.city,
       duration: formValues.numberOfDays,
-      previousItinerary: itinerary,
+      previousItinerary: JSON.stringify(itinerary),
     });
     if (result.success) {
       setItinerary(result.data);
@@ -214,11 +216,7 @@ export default function ItineraryGenerator() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[500px] w-full rounded-md border p-4 bg-secondary/30">
-              <pre className="whitespace-pre-wrap font-body text-sm leading-relaxed">
-                {itinerary}
-              </pre>
-            </ScrollArea>
+            <ItineraryTable itinerary={itinerary} />
           </CardContent>
           <CardFooter>
             <Button

@@ -17,8 +17,18 @@ const ReviseTravelItineraryInputSchema = z.object({
 });
 export type ReviseTravelItineraryInput = z.infer<typeof ReviseTravelItineraryInputSchema>;
 
+const ItineraryItemSchema = z.object({
+  day: z.number().describe('The day of the itinerary.'),
+  timeOfDay: z.string().describe('The time of day for the activity.'),
+  spot: z.string().describe('The name of the location or attraction.'),
+  thingsToDo: z.string().describe('A description of activities at the location.'),
+  ticketInfo: z.string().describe('Information on how to get tickets, if applicable.'),
+  facts: z.string().describe('Interesting facts about the place.'),
+  reviews: z.string().describe('Recent reviews from a trusted site like Google.'),
+});
+
 const ReviseTravelItineraryOutputSchema = z.object({
-  revisedItinerary: z.string().describe('A revised travel itinerary based on the user input.'),
+  revisedItinerary: z.array(ItineraryItemSchema).describe('A revised travel itinerary based on the user input.'),
 });
 export type ReviseTravelItineraryOutput = z.infer<typeof ReviseTravelItineraryOutputSchema>;
 

@@ -17,10 +17,22 @@ const TravelItineraryInputSchema = z.object({
 });
 export type TravelItineraryInput = z.infer<typeof TravelItineraryInputSchema>;
 
+const ItineraryItemSchema = z.object({
+  day: z.number().describe('The day of the itinerary.'),
+  timeOfDay: z.string().describe('The time of day for the activity.'),
+  spot: z.string().describe('The name of the location or attraction.'),
+  thingsToDo: z.string().describe('A description of activities at the location.'),
+  ticketInfo: z.string().describe('Information on how to get tickets, if applicable.'),
+  facts: z.string().describe('Interesting facts about the place.'),
+  reviews: z.string().describe('Recent reviews from a trusted site like Google.'),
+});
+
 const TravelItineraryOutputSchema = z.object({
-  itinerary: z.string().describe('The generated travel itinerary.'),
+  itinerary: z.array(ItineraryItemSchema).describe('The generated travel itinerary.'),
 });
 export type TravelItineraryOutput = z.infer<typeof TravelItineraryOutputSchema>;
+export type ItineraryItem = z.infer<typeof ItineraryItemSchema>;
+
 
 export async function generateTravelItinerary(input: TravelItineraryInput): Promise<TravelItineraryOutput> {
   return generateTravelItineraryFlow(input);
