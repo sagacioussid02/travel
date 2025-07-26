@@ -4,6 +4,7 @@ import ItineraryGenerator from '@/components/itinerary/ItineraryGenerator';
 import DefaultItineraries from '@/components/itinerary/DefaultItineraries';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { InstagramReels } from '@/components/instagram/InstagramReels';
 
 export default function Home() {
   return (
@@ -20,6 +21,8 @@ export default function Home() {
           </p>
         </section>
         
+        <InstagramReels />
+
         <ItineraryGenerator />
 
         <section className="mt-20 md:mt-28">
