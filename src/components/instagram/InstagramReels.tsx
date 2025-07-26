@@ -15,7 +15,7 @@ const reels = [
 
 export function InstagramReels() {
   return (
-    <section className="mb-12 md:mb-16">
+    <section className="mb-8 md:mb-12">
       <h2 className="text-3xl md:text-4xl font-bold font-headline text-center mb-10 text-foreground flex items-center justify-center gap-3">
         <Instagram className="w-8 h-8" />
         Trending Reels
