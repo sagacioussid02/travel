@@ -1,15 +1,14 @@
-import { Card, CardContent } from '@/components/ui/card';
 import { Instagram, Heart } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const reels = [
-  { id: 1, src: 'https://placehold.co/250x450.png', hint: 'travel reel', likes: '1.2M' },
-  { id: 2, src: 'https://placehold.co/250x450.png', hint: 'beach sunset', likes: '890K' },
-  { id: 3, src: 'https://placehold.co/250x450.png', hint: 'mountain hike', likes: '2.5M' },
-  { id: 4, src: 'https://placehold.co/250x450.png', hint: 'city nightlife', likes: '500K' },
-  { id: 5, src: 'https://placehold.co/250x450.png', hint: 'food market', likes: '1.8M' },
-  { id: 6, src: 'https://placehold.co/250x450.png', hint: 'ancient ruins', likes: '3.1M' },
-  { id: 7, src: 'https://placehold.co/250x450.png', hint: 'exotic wildlife', likes: '950K' },
+  { id: 1, src: 'https://placehold.co/250x450', hint: 'travel reel', likes: '1.2M' },
+  { id: 2, src: 'https://placehold.co/250x450', hint: 'beach sunset', likes: '890K' },
+  { id: 3, src: 'https://placehold.co/250x450', hint: 'mountain hike', likes: '2.5M' },
+  { id: 4, src: 'https://placehold.co/250x450', hint: 'city nightlife', likes: '500K' },
+  { id: 5, src: 'https://placehold.co/250x450', hint: 'food market', likes: '1.8M' },
+  { id: 6, src: 'https://placehold.co/250x450', hint: 'ancient ruins', likes: '3.1M' },
+  { id: 7, src: 'https://placehold.co/250x450', hint: 'exotic wildlife', likes: '950K' },
 ];
 
 export function InstagramReels() {
@@ -32,7 +31,7 @@ export function InstagramReels() {
               <div className="p-1">
                  <a href="https://www.instagram.com/sidoni_clickz/reels/" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 relative">
                     <img
-                        src={reel.src}
+                        src={reel.src + '.png'}
                         alt={`Instagram reel ${reel.id}`}
                         width={250}
                         height={450}
