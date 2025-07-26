@@ -8,13 +8,13 @@ export function Footer() {
           &copy; {new Date().getFullYear()} Sidoni. All rights reserved.
         </p>
         <a 
-          href="https://instagram.com/sidoni.travel" 
+          href="https://instagram.com/sidoni_clickz" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="flex items-center gap-2 hover:text-primary transition-colors"
         >
           <Instagram className="w-4 h-4" />
-          @sidoni.travel
+          @sidoni_clickz
         </a>
       </div>
     </footer>

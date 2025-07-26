@@ -15,7 +15,7 @@ const reels = [
 
 export function InstagramReels() {
   return (
-    <section className="mb-20 md:mb-28">
+    <section className="mb-12 md:mb-16">
       <h2 className="text-3xl md:text-4xl font-bold font-headline text-center mb-10 text-foreground flex items-center justify-center gap-3">
         <Instagram className="w-8 h-8" />
         Trending Reels
@@ -32,7 +32,7 @@ export function InstagramReels() {
             <CarouselItem key={reel.id} className="basis-1/2 md:basis-1/3 lg:basis-1/5">
               <div className="p-1">
                 <Card className="overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
-                  <a href="https://instagram.com/sidoni.travel" target="_blank" rel="noopener noreferrer">
+                  <a href="https://instagram.com/sidoni_clickz" target="_blank" rel="noopener noreferrer">
                     <CardContent className="p-0 relative">
                       <Image
                         src={reel.src}
@@ -44,7 +44,7 @@ export function InstagramReels() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                       <div className="absolute bottom-2 left-2 text-white">
-                        <p className="text-xs font-semibold">@sidoni.travel</p>
+                        <p className="text-xs font-semibold">@sidoni_clickz</p>
                         <div className="flex items-center gap-1 text-xs">
                            <Heart className="w-3 h-3 text-red-500 fill-current" />
                            {reel.likes}
