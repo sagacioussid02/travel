@@ -17,14 +17,20 @@ const ReviseTravelItineraryInputSchema = z.object({
 });
 export type ReviseTravelItineraryInput = z.infer<typeof ReviseTravelItineraryInputSchema>;
 
+const OptionalSpotSchema = z.object({
+  spot: z.string().describe('The name of the optional location or attraction.'),
+  description: z.string().describe('A short description of the optional spot.'),
+});
+
 const ItineraryItemSchema = z.object({
   day: z.number().describe('The day of the itinerary.'),
-  timeOfDay: z.string().describe('The time of day for the activity.'),
-  spot: z.string().describe('The name of the location or attraction.'),
-  thingsToDo: z.string().describe('A description of activities at the location.'),
+  time: z.string().describe('A granular time for the activity (e.g., "9:00 AM").'),
+  spot: z.string().describe('The name of the main recommended location or attraction.'),
+  thingsToDo: z.string().describe('A description of activities at the main location.'),
   ticketInfo: z.string().describe('Information on how to get tickets, if applicable.'),
   facts: z.string().describe('Interesting facts about the place.'),
   reviews: z.string().describe('Recent reviews from a trusted site like Google.'),
+  optionalSpots: z.array(OptionalSpotSchema).describe('A list of optional nearby places to visit.'),
 });
 
 const ReviseTravelItineraryOutputSchema = z.object({
@@ -50,7 +56,12 @@ const prompt = ai.definePrompt({
   {{previousItinerary}}
   {% endif %}
 
-  Create a new itinerary with a different arrangement of travel spots considering the city and duration. The itinierary should be like day, time of the day, the spot, things to do there, how to get tickets, some facts about the place and recent reviews from a trusted site like google.
+  Create a new itinerary with a different arrangement of travel spots considering the city and duration. 
+  
+  For each itinerary item, provide:
+  - A granular time (e.g., "9:00 AM", "1:00 PM").
+  - One main suggested spot with things to do, ticket info, facts, and reviews.
+  - A few optional spots nearby that the user could visit as alternatives.
   `,
 });
 

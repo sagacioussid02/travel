@@ -17,19 +17,26 @@ const PopulateDefaultItinerariesInputSchema = z.object({
 });
 export type PopulateDefaultItinerariesInput = z.infer<typeof PopulateDefaultItinerariesInputSchema>;
 
-const PopulateDefaultItinerariesOutputSchema = z.object({
-  itinerary: z.array(
-    z.object({
-      day: z.number().describe('The day of the itinerary.'),
-      timeOfDay: z.string().describe('The time of day for the activity.'),
-      spot: z.string().describe('The name of the location or attraction.'),
-      thingsToDo: z.string().describe('A description of activities at the location.'),
-      ticketInfo: z.string().describe('Information on how to get tickets, if applicable.'),
-      facts: z.string().describe('Interesting facts about the place.'),
-      reviews: z.string().describe('Recent reviews from a trusted site like Google.'),
-    })
-  ).describe('A list of daily itineraries.'),
+const OptionalSpotSchema = z.object({
+  spot: z.string().describe('The name of the optional location or attraction.'),
+  description: z.string().describe('A short description of the optional spot.'),
 });
+
+const ItineraryItemSchema = z.object({
+  day: z.number().describe('The day of the itinerary.'),
+  time: z.string().describe('A granular time for the activity (e.g., "9:00 AM").'),
+  spot: z.string().describe('The name of the main recommended location or attraction.'),
+  thingsToDo: z.string().describe('A description of activities at the main location.'),
+  ticketInfo: z.string().describe('Information on how to get tickets, if applicable.'),
+  facts: z.string().describe('Interesting facts about the place.'),
+  reviews: z.string().describe('Recent reviews from a trusted site like Google.'),
+  optionalSpots: z.array(OptionalSpotSchema).describe('A list of optional nearby places to visit.'),
+});
+
+const PopulateDefaultItinerariesOutputSchema = z.object({
+  itinerary: z.array(ItineraryItemSchema).describe('A list of daily itineraries.'),
+});
+
 export type PopulateDefaultItinerariesOutput = z.infer<typeof PopulateDefaultItinerariesOutputSchema>;
 
 export async function populateDefaultItineraries(input: PopulateDefaultItinerariesInput): Promise<PopulateDefaultItinerariesOutput> {
@@ -45,17 +52,16 @@ const prompt = ai.definePrompt({
   Create a travel itinerary for the following destination: {{{destination}}}
   The itinerary should be for {{{durationDays}}} days.
 
-  The itinerary should include the following information for each day:
+  The itinerary should include the following information for each item:
   - day: The day of the itinerary.
-  - timeOfDay: The time of day for the activity.
-  - spot: The name of the location or attraction.
-  - thingsToDo: A description of activities at the location.
+  - time: A granular time for the activity (e.g., "9:00 AM").
+  - spot: The main recommended location or attraction.
+  - thingsToDo: A description of activities at the main location.
   - ticketInfo: Information on how to get tickets, if applicable.
   - facts: Interesting facts about the place.
   - reviews: Recent reviews from a trusted site like Google.
-
-  The itinerary should be returned in a JSON format that matches the following schema:
-  ${JSON.stringify(PopulateDefaultItinerariesOutputSchema.shape, null, 2)}`,
+  - optionalSpots: A list of optional nearby places to visit with a short description.
+  `,
 });
 
 const populateDefaultItinerariesFlow = ai.defineFlow(

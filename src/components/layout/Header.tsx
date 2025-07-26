@@ -8,7 +8,7 @@ export function Header() {
           <MountainSnow className="h-6 w-6 text-primary" />
         </div>
         <a href="/" className="text-2xl font-headline font-bold text-foreground">
-          WanderWise AI
+          Sidoni
         </a>
       </div>
     </header>

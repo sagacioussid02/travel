@@ -12,7 +12,7 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8 md:py-12 flex-grow w-full">
         <section className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold font-headline mb-4 text-foreground">
-            WanderWise AI
+            Sidoni
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Your personal AI travel agent. Tell us where you're going and for how

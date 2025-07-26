@@ -8,14 +8,21 @@ import { populateDefaultItineraries } from '@/ai/flows/populate-default-itinerar
 import type { ItineraryItem } from '@/lib/types';
 import {
   CalendarDays,
+  ChevronDown,
   Lightbulb,
   MapPin,
   MessageSquare,
   Ticket,
-  Users,
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import { Button } from '../ui/button';
 
 const defaultDestinations = [
   { destination: 'Paris, France', durationDays: 3, image: 'https://placehold.co/400x200', hint: 'eiffel tower' },
@@ -95,8 +102,25 @@ function ItineraryDayCard({ item }: { item: ItineraryItem }) {
             Day {item.day}
           </Badge>
           <h4 className="text-lg font-bold font-headline">{item.spot}</h4>
-          <p className="text-sm text-muted-foreground">{item.timeOfDay}</p>
+          <p className="text-sm text-muted-foreground">{item.time}</p>
         </div>
+        {item.optionalSpots && item.optionalSpots.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                Optional Spots <ChevronDown className="w-4 h-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {item.optionalSpots.map((spot, i) => (
+                <DropdownMenuItem key={i} className="flex flex-col items-start gap-1">
+                  <p className="font-semibold">{spot.spot}</p>
+                  <p className="text-xs text-muted-foreground">{spot.description}</p>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       <div className="space-y-4 text-sm">
