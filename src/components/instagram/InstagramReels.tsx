@@ -30,7 +30,7 @@ export function InstagramReels() {
           {reels.map((reel) => (
             <CarouselItem key={reel.id} className="basis-1/2 md:basis-1/3 lg:basis-1/5">
               <div className="p-1">
-                 <a href="https://www.instagram.com/sidoni_clickz/" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 relative">
+                 <a href="https://www.instagram.com/sidoni_clickz/reels/" target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 relative">
                     <img
                         src={reel.src}
                         alt={`Instagram reel ${reel.id}`}
