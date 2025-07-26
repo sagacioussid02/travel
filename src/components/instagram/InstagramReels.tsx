@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Instagram, Heart } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -32,9 +31,9 @@ export function InstagramReels() {
             <CarouselItem key={reel.id} className="basis-1/2 md:basis-1/3 lg:basis-1/5">
               <div className="p-1">
                 <Card className="overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
-                  <a href="https://instagram.com/sidoni_clickz" target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.instagram.com/sidoni_clickz/" target="_blank" rel="noopener noreferrer">
                     <CardContent className="p-0 relative">
-                      <Image
+                      <img
                         src={reel.src}
                         alt={`Instagram reel ${reel.id}`}
                         width={250}
