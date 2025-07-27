@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { InstagramReels } from '@/components/instagram/InstagramReels';
 import * as React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import AdBanner from '@/components/ads/AdBanner';
 
 export default function Home() {
   return (
@@ -24,6 +25,8 @@ export default function Home() {
 
         <ItineraryGenerator />
 
+        <AdBanner />
+
         <Suspense fallback={<ReelsSkeleton />}>
           <InstagramReels />
         </Suspense>
@@ -36,6 +39,8 @@ export default function Home() {
             <DefaultItineraries />
           </Suspense>
         </section>
+
+        <AdBanner />
       </main>
       <Footer />
     </div>
