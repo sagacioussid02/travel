@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {cache} from 'react';
 
 const PopulateDefaultItinerariesInputSchema = z.object({
   destination: z.string().describe('The destination for the travel itinerary.'),
@@ -39,9 +40,9 @@ const PopulateDefaultItinerariesOutputSchema = z.object({
 
 export type PopulateDefaultItinerariesOutput = z.infer<typeof PopulateDefaultItinerariesOutputSchema>;
 
-export async function populateDefaultItineraries(input: PopulateDefaultItinerariesInput): Promise<PopulateDefaultItinerariesOutput> {
+export const populateDefaultItineraries = cache(async function populateDefaultItineraries(input: PopulateDefaultItinerariesInput): Promise<PopulateDefaultItinerariesOutput> {
   return populateDefaultItinerariesFlow(input);
-}
+});
 
 const prompt = ai.definePrompt({
   name: 'populateDefaultItinerariesPrompt',

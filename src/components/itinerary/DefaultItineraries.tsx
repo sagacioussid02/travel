@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
+import { cache } from 'react';
 
 const defaultDestinations = [
   { destination: 'Paris, France', durationDays: 3, image: 'https://placehold.co/400x200', hint: 'eiffel tower' },
@@ -30,11 +31,13 @@ const defaultDestinations = [
   { destination: 'Rome, Italy', durationDays: 4, image: 'https://placehold.co/400x200', hint: 'colosseum rome' },
 ];
 
+const cachedPopulateDefaultItineraries = cache(populateDefaultItineraries);
+
 export default async function DefaultItineraries() {
   const itineraries = await Promise.all(
     defaultDestinations.map(async (dest) => {
       try {
-        const result = await populateDefaultItineraries(dest);
+        const result = await cachedPopulateDefaultItineraries(dest);
         return { ...dest, ...result };
       } catch (error) {
         console.error(`Failed to fetch itinerary for ${dest.destination}`, error);
