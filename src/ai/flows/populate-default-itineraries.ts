@@ -40,9 +40,13 @@ const PopulateDefaultItinerariesOutputSchema = z.object({
 
 export type PopulateDefaultItinerariesOutput = z.infer<typeof PopulateDefaultItinerariesOutputSchema>;
 
-export const populateDefaultItineraries = cache(async function populateDefaultItineraries(input: PopulateDefaultItinerariesInput): Promise<PopulateDefaultItinerariesOutput> {
-  return populateDefaultItinerariesFlow(input);
-});
+export const populateDefaultItineraries = cache(
+  async (
+    input: PopulateDefaultItinerariesInput
+  ): Promise<PopulateDefaultItinerariesOutput> => {
+    return populateDefaultItinerariesFlow(input);
+  }
+);
 
 const prompt = ai.definePrompt({
   name: 'populateDefaultItinerariesPrompt',
