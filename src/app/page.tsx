@@ -5,6 +5,7 @@ import DefaultItineraries from '@/components/itinerary/DefaultItineraries';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InstagramReels } from '@/components/instagram/InstagramReels';
+import * as React from 'react';
 
 export default function Home() {
   return (
