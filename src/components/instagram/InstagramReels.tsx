@@ -13,10 +13,6 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 
-const { publicRuntimeConfig } = getConfig() || {};
-const basePath = publicRuntimeConfig?.basePath || '';
-
-
 const videoFiles = [
   'timessq.mp4',
   'summit.mp4',
@@ -30,6 +26,9 @@ export function InstagramReels() {
   const [videoErrors, setVideoErrors] = React.useState<boolean[]>(
     Array(videoFiles.length).fill(false)
   );
+
+  const { publicRuntimeConfig } = getConfig() || {};
+  const basePath = publicRuntimeConfig?.basePath || '';
 
   const handleVideoError = (index: number) => {
     setVideoErrors(prevErrors => {
