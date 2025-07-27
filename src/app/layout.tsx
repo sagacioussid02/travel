@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'WanderWise AI',
-  description: 'Your personal AI travel agent',
+  title: 'Sidoni',
+  description: 'Your personal AI travel agent for tailor-made itineraries.',
 };
 
 export default function RootLayout({
