@@ -18,8 +18,7 @@ export default function Home() {
             Sidoni
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Your personal AI travel agent. Tell us where you're going and for how
-            long, and we'll craft the perfect journey for you.
+            Unlock your next extraordinary journey. We're not just another travel agent; we are your personal AI-powered guide. While others offer generic packages, our intelligent platform crafts unique, tailor-made itineraries in seconds, perfectly matching your travel style.
           </p>
         </section>
 
