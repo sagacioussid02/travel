@@ -1,7 +1,9 @@
+
 'use client';
 
-import * as React from 'react';
 import Autoplay from 'embla-carousel-autoplay';
+import * as React from 'react';
+
 import {
   Carousel,
   CarouselContent,
@@ -9,11 +11,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import getConfig from 'next/config';
-
-const { publicRuntimeConfig } = getConfig() || { publicRuntimeConfig: {} };
-const basePath = publicRuntimeConfig.basePath || '';
-
 
 const videoFiles = [
   'timessq.mp4',
@@ -30,7 +27,7 @@ export function InstagramReels() {
   );
 
   const handleVideoError = (index: number) => {
-    setVideoErrors((prevErrors) => {
+    setVideoErrors(prevErrors => {
       const newErrors = [...prevErrors];
       newErrors[index] = true;
       return newErrors;
@@ -66,7 +63,10 @@ export function InstagramReels() {
         >
           <CarouselContent className="-ml-4">
             {videoFiles.map((videoFile, index) => (
-              <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
+              <CarouselItem
+                key={index}
+                className="pl-4 md:basis-1/2 lg:basis-1/3"
+              >
                 <a
                   href="https://www.instagram.com/sidoni_clickz/reels/"
                   target="_blank"
@@ -82,7 +82,7 @@ export function InstagramReels() {
                       playsInline
                       loop
                       onError={() => handleVideoError(index)}
-                      src={`${basePath}/videos/${videoFile}`}
+                      src={`/videos/${videoFile}`}
                     >
                       Your browser does not support the video tag.
                     </video>
