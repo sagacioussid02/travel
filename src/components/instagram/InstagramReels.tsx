@@ -2,7 +2,7 @@ import { Instagram } from 'lucide-react';
 
 export function InstagramReels() {
   return (
-    <section className="mb-12 md:mb-16">
+    <section className="mb-12 md:mb-16 flex flex-col items-center">
       <a
         href="https://www.instagram.com/sidoni_clickz/reels/"
         target="_blank"
@@ -12,19 +12,17 @@ export function InstagramReels() {
         <Instagram className="w-8 h-8" />
         Featured Reel
       </a>
-      <div className="flex justify-center">
-        <div className="w-full max-w-[250px] rounded-xl shadow-lg overflow-hidden bg-card">
-          <video
-            controls
-            width="250"
-            className="w-full h-auto object-cover"
-            poster="https://placehold.co/250x450.png"
-            data-ai-hint="travel video"
-          >
-            <source src="/videos/reel.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
+      <div className="w-full max-w-[250px] rounded-xl shadow-lg overflow-hidden bg-card">
+        <video
+          controls
+          width="250"
+          className="w-full h-auto"
+          poster="https://placehold.co/250x450.png"
+          data-ai-hint="travel video"
+        >
+          <source src="/videos/reel.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
       </div>
     </section>
   );
