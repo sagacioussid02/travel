@@ -19,13 +19,11 @@ export default function Home() {
             Sidoni
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Unlock your next extraordinary journey. We're not just another travel agent; our intelligent platform crafts unique, tailor-made itineraries in seconds, perfectly matching your travel style.
+            Unlock your next extraordinary journey. Our intelligent platform crafts unique, tailor-made itineraries in seconds, perfectly matching your travel style.
           </p>
         </section>
 
         <ItineraryGenerator />
-
-        <AdBanner />
 
         <Suspense fallback={<ReelsSkeleton />}>
           <InstagramReels />
