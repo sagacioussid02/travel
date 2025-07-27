@@ -2,7 +2,6 @@
 
 import Autoplay from 'embla-carousel-autoplay';
 import * as React from 'react';
-import getConfig from 'next/config';
 
 import {
   Carousel,
@@ -25,9 +24,6 @@ export function InstagramReels() {
   const [videoErrors, setVideoErrors] = React.useState<boolean[]>(
     Array(videoFiles.length).fill(false)
   );
-
-  const { publicRuntimeConfig } = getConfig() || {};
-  const basePath = publicRuntimeConfig?.basePath || '';
 
   const handleVideoError = (index: number) => {
     setVideoErrors(prevErrors => {
@@ -85,7 +81,7 @@ export function InstagramReels() {
                       playsInline
                       loop
                       onError={() => handleVideoError(index)}
-                      src={`${basePath}/videos/${videoFile}`}
+                      src={`/videos/${videoFile}`}
                     >
                       Your browser does not support the video tag.
                     </video>

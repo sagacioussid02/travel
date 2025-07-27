@@ -67,7 +67,7 @@ body {
     @apply border-border;
   }
   body {
-    background-image: url('/travel/images/bkg.jpeg');
+    background-image: url('/images/bkg.jpeg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

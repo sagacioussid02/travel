@@ -1,10 +1,7 @@
 import type {NextConfig} from 'next';
 
-const basePath = '/travel';
-
 const nextConfig: NextConfig = {
   /* config options here */
-  basePath,
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -20,9 +17,6 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-  },
-  publicRuntimeConfig: {
-    basePath,
   },
 };
 
