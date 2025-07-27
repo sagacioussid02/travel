@@ -2,21 +2,21 @@ import { Instagram } from 'lucide-react';
 
 export function InstagramReels() {
   return (
-    <section className="mb-12 md:mb-16 flex flex-col items-center">
+    <section className="mb-12 md:mb-16 flex flex-col items-center gap-6">
       <a
         href="https://www.instagram.com/sidoni_clickz/reels/"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-3xl md:text-4xl font-bold font-headline text-center mb-10 text-foreground flex items-center justify-center gap-3 hover:text-primary transition-colors"
+        className="text-3xl md:text-4xl font-bold font-headline text-center text-foreground flex items-center justify-center gap-3 hover:text-primary transition-colors"
       >
         <Instagram className="w-8 h-8" />
         Featured Reel
       </a>
-      <div className="w-full max-w-[250px] rounded-xl shadow-lg overflow-hidden bg-card">
+      <div className="w-full max-w-[250px] rounded-xl shadow-lg overflow-hidden">
         <video
           controls
           width="250"
-          className="w-full h-auto"
+          className="w-full h-auto block"
           poster="https://placehold.co/250x450.png"
           data-ai-hint="travel video"
         >
