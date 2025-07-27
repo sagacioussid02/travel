@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/carousel';
 
 const { publicRuntimeConfig } = getConfig() || {};
-const { basePath } = publicRuntimeConfig || {};
+const basePath = publicRuntimeConfig?.basePath || '';
 
 
 const videoFiles = [
@@ -87,7 +87,7 @@ export function InstagramReels() {
                       playsInline
                       loop
                       onError={() => handleVideoError(index)}
-                      src={`${basePath || ''}/videos/${videoFile}`}
+                      src={`${basePath}/videos/${videoFile}`}
                     >
                       Your browser does not support the video tag.
                     </video>
