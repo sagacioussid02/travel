@@ -30,7 +30,6 @@ export function InstagramReels() {
             className="w-full rounded-lg"
             onError={() => setVideoError(true)}
             src="/videos/reels.mp4"
-            onClick={(e) => e.preventDefault()}
           >
             Your browser does not support the video tag.
           </video>
