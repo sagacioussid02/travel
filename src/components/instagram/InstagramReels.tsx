@@ -19,14 +19,22 @@ export function InstagramReels() {
           </a>
         </h3>
 
-        <video
-          controls
-          className="w-full rounded-lg"
-          onError={() => setVideoError(true)}
-          src="/videos/reels.mp4"
+        <a
+          href="https://www.instagram.com/sidoni_clickz/reels/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
         >
-          Your browser does not support the video tag.
-        </video>
+          <video
+            controls
+            className="w-full rounded-lg"
+            onError={() => setVideoError(true)}
+            src="/videos/reels.mp4"
+            onClick={(e) => e.preventDefault()}
+          >
+            Your browser does not support the video tag.
+          </video>
+        </a>
 
         {videoError && (
           <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-md text-sm">
