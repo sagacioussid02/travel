@@ -1,9 +1,27 @@
 'use client';
 
 import * as React from 'react';
+import Autoplay from 'embla-carousel-autoplay';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from '@/components/ui/carousel';
+
+const videoFiles = ['reels.mp4', 'reels2.mp4', 'reels3.mp4'];
 
 export function InstagramReels() {
-  const [videoError, setVideoError] = React.useState(false);
+  const [videoErrors, setVideoErrors] = React.useState<boolean[]>(
+    Array(videoFiles.length).fill(false)
+  );
+
+  const handleVideoError = (index: number) => {
+    setVideoErrors((prevErrors) => {
+      const newErrors = [...prevErrors];
+      newErrors[index] = true;
+      return newErrors;
+    });
+  };
 
   return (
     <div className="my-8 flex justify-center">
@@ -15,38 +33,66 @@ export function InstagramReels() {
             rel="noopener noreferrer"
             className="hover:text-primary hover:underline"
           >
-            Featured Reel
+            Featured Reels
           </a>
         </h3>
 
-        <a
-          href="https://www.instagram.com/sidoni_clickz/reels/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block"
+        <Carousel
+          className="w-full"
+          plugins={[
+            Autoplay({
+              delay: 5000,
+              stopOnInteraction: true,
+            }),
+          ]}
+          opts={{
+            loop: true,
+          }}
         >
-          <video
-            controls
-            className="w-full rounded-lg"
-            onError={() => setVideoError(true)}
-            src="/videos/reels.mp4"
-          >
-            Your browser does not support the video tag.
-          </video>
-        </a>
-
-        {videoError && (
-          <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-md text-sm">
-            <p className="font-bold">Video Not Found</p>
-            <p>
-              Please make sure you have placed your video file at the following
-              location in your project:
-            </p>
-            <code className="block bg-black/20 p-2 rounded-sm mt-2 text-xs">
-              public/videos/reels.mp4
-            </code>
-          </div>
-        )}
+          <CarouselContent>
+            {videoFiles.map((videoFile, index) => (
+              <CarouselItem key={index}>
+                <a
+                  href="https://www.instagram.com/sidoni_clickz/reels/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <video
+                    controls
+                    className="w-full rounded-lg"
+                    muted
+                    autoPlay
+                    playsInline
+                    loop
+                    onError={() => handleVideoError(index)}
+                    src={`/videos/${videoFile}`}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </a>
+                {videoErrors[index] && (
+                  <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-md text-sm">
+                    <p className="font-bold">Video Not Found</p>
+                    <p>
+                      Could not find video:{' '}
+                      <code className="bg-black/20 p-1 rounded-sm text-xs">
+                        {videoFile}
+                      </code>
+                    </p>
+                    <p>
+                      Please place it in the{' '}
+                      <code className="bg-black/20 p-1 rounded-sm text-xs">
+                        public/videos/
+                      </code>{' '}
+                      directory.
+                    </p>
+                  </div>
+                )}
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
 
         <div className="mt-4">
           <a
