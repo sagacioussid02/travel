@@ -16,7 +16,6 @@ const videoFiles = [
   'statue.mp4',
   'sandiego.mp4',
   'landing.mp4',
-  'flyneon.mp4',
   'brooklyn.mp4',
 ];
 
