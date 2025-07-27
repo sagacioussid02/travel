@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { populateDefaultItineraries } from '@/ai/flows/populate-default-itineraries';
+import { generateImage } from '@/ai/flows/generate-image';
 import type { ItineraryItem } from '@/lib/types';
 import {
   CalendarDays,
@@ -25,21 +26,33 @@ import {
 import { Button } from '../ui/button';
 
 const defaultDestinations = [
-  { destination: 'New York City, USA', durationDays: 5, image: 'https://placehold.co/400x200', hint: 'new york' },
-  { destination: 'Niagara Falls, USA', durationDays: 2, image: 'https://placehold.co/400x200', hint: 'niagara falls' },
-  { destination: 'Las Vegas, USA', durationDays: 3, image: 'https://placehold.co/400x200', hint: 'las vegas' },
-  { destination: 'San Diego, USA', durationDays: 4, image: 'https://placehold.co/400x200', hint: 'san diego' },
+  { destination: 'New York City, USA', durationDays: 5, hint: 'new york city' },
+  { destination: 'Niagara Falls, USA', durationDays: 2, hint: 'niagara falls' },
+  { destination: 'Las Vegas, USA', durationDays: 3, hint: 'las vegas strip' },
+  { destination: 'San Diego, USA', durationDays: 4, hint: 'san diego beach' },
 ];
 
 export default async function DefaultItineraries() {
   const itineraries = await Promise.all(
     defaultDestinations.map(async (dest) => {
       try {
-        const result = await populateDefaultItineraries(dest);
-        return { ...dest, ...result };
+        const [itineraryResult, imageResult] = await Promise.all([
+           populateDefaultItineraries(dest),
+           generateImage({ prompt: dest.hint }),
+        ]);
+        
+        return { 
+          ...dest, 
+          itinerary: itineraryResult.itinerary,
+          imageUrl: imageResult.imageUrl, 
+        };
       } catch (error) {
-        console.error(`Failed to fetch itinerary for ${dest.destination}`, error);
-        return { ...dest, itinerary: [] };
+        console.error(`Failed to fetch data for ${dest.destination}`, error);
+        return { 
+          ...dest,
+          itinerary: [],
+          imageUrl: 'https://placehold.co/400x200.png',
+        };
       }
     })
   );
@@ -56,7 +69,7 @@ export default async function DefaultItineraries() {
             <AccordionTrigger className="bg-card p-4 rounded-lg shadow-md hover:no-underline hover:shadow-lg transition-shadow text-left">
               <div className="flex items-center gap-4 w-full">
                 <Image
-                  src={plan.image}
+                  src={plan.imageUrl}
                   alt={plan.destination}
                   width={100}
                   height={60}
