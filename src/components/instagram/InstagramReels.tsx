@@ -37,6 +37,13 @@ export function InstagramReels() {
     });
   };
 
+  // This prevents hydration errors by ensuring the path is only constructed on the client.
+  const [isClient, setIsClient] = React.useState(false);
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+
   return (
     <div className="my-8 flex justify-center">
       <div className="w-full max-w-4xl rounded-lg border bg-card text-card-foreground shadow-sm text-center p-6">
@@ -65,7 +72,7 @@ export function InstagramReels() {
           }}
         >
           <CarouselContent className="-ml-4">
-            {videoFiles.map((videoFile, index) => (
+            {isClient && videoFiles.map((videoFile, index) => (
               <CarouselItem
                 key={index}
                 className="pl-4 md:basis-1/2 lg:basis-1/3"
