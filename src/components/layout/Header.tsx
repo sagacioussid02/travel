@@ -1,5 +1,4 @@
 import { MountainSnow } from 'lucide-react';
-import Image from 'next/image';
 
 export function Header() {
   return (
@@ -13,19 +12,6 @@ export function Header() {
             Sidoni
           </a>
         </div>
-        <a
-          href="https://coff.ee/sidonitravels"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-            alt="Buy Me A Coffee"
-            height={40}
-            width={144} 
-            className="rounded-lg shadow-md hover:shadow-lg transition-shadow"
-          />
-        </a>
       </div>
     </header>
   );
