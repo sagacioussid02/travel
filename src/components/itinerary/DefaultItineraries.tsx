@@ -25,9 +25,10 @@ import {
 import { Button } from '../ui/button';
 
 const defaultDestinations = [
-  { destination: 'Paris, France', durationDays: 3, image: 'https://placehold.co/400x200', hint: 'eiffel tower' },
-  { destination: 'Tokyo, Japan', durationDays: 5, image: 'https://placehold.co/400x200', hint: 'shibuya crossing' },
-  { destination: 'Rome, Italy', durationDays: 4, image: 'https://placehold.co/400x200', hint: 'colosseum rome' },
+  { destination: 'New York City, USA', durationDays: 5, image: 'https://placehold.co/400x200', hint: 'new york' },
+  { destination: 'Niagara Falls, USA', durationDays: 2, image: 'https://placehold.co/400x200', hint: 'niagara falls' },
+  { destination: 'Las Vegas, USA', durationDays: 3, image: 'https://placehold.co/400x200', hint: 'las vegas' },
+  { destination: 'San Diego, USA', durationDays: 4, image: 'https://placehold.co/400x200', hint: 'san diego' },
 ];
 
 export default async function DefaultItineraries() {
