@@ -1,17 +1,10 @@
-import { Instagram } from 'lucide-react';
 
 export function InstagramReels() {
   return (
     <section className="mb-12 md:mb-16 flex flex-col items-center gap-6">
-      <a
-        href="https://www.instagram.com/sidoni_clickz/reels/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-3xl md:text-4xl font-bold font-headline text-center text-foreground flex items-center justify-center gap-3 hover:text-primary transition-colors"
-      >
-        <Instagram className="w-8 h-8" />
+      <h2 className="text-3xl md:text-4xl font-bold font-headline text-center text-foreground">
         Featured Reel
-      </a>
+      </h2>
       <div className="w-full max-w-[250px] rounded-xl shadow-lg overflow-hidden">
         <video
           controls
