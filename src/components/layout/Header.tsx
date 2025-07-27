@@ -1,5 +1,5 @@
-import { MountainSnow, Coffee } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { MountainSnow } from 'lucide-react';
+import Image from 'next/image';
 
 export function Header() {
   return (
@@ -13,16 +13,19 @@ export function Header() {
             Sidoni
           </a>
         </div>
-        <Button asChild variant="secondary">
-          <a
-            href="https://coff.ee/sidonitravels"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Coffee className="mr-2 h-4 w-4" />
-            Buy me a coffee
-          </a>
-        </Button>
+        <a
+          href="https://coff.ee/sidonitravels"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Image
+            src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+            alt="Buy Me A Coffee"
+            height={40}
+            width={144} 
+            className="rounded-lg shadow-md hover:shadow-lg transition-shadow"
+          />
+        </a>
       </div>
     </header>
   );
