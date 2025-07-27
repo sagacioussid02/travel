@@ -25,7 +25,7 @@ const AdBanner = () => {
             <ins
               className="adsbygoogle"
               style={{ display: 'block' }}
-              data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" // Replace with your Publisher ID
+              data-ad-client="ca-pub-5569260250536304" // Replace with your Publisher ID
               data-ad-slot="YOUR_AD_SLOT_ID" // Replace with your Ad Slot ID
               data-ad-format="auto"
               data-full-width-responsive="true"
