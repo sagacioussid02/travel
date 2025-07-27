@@ -9,6 +9,11 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import getConfig from 'next/config';
+
+const { publicRuntimeConfig } = getConfig() || { publicRuntimeConfig: {} };
+const basePath = publicRuntimeConfig.basePath || '';
+
 
 const videoFiles = [
   'timessq.mp4',
@@ -77,7 +82,7 @@ export function InstagramReels() {
                       playsInline
                       loop
                       onError={() => handleVideoError(index)}
-                      src={`/videos/${videoFile}`}
+                      src={`${basePath}/videos/${videoFile}`}
                     >
                       Your browser does not support the video tag.
                     </video>
