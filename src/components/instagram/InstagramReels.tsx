@@ -37,7 +37,6 @@ export function InstagramReels() {
     });
   };
 
-  // This prevents hydration errors by ensuring the path is only constructed on the client.
   const [isClient, setIsClient] = React.useState(false);
   React.useEffect(() => {
     setIsClient(true);
