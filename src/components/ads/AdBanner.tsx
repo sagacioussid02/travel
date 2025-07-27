@@ -12,7 +12,10 @@ declare global {
 const AdBanner = () => {
   useEffect(() => {
     try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      // We check if the adsbygoogle script has loaded.
+      if (window.adsbygoogle) {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      }
     } catch (err) {
       console.error('AdSense error:', err);
     }
