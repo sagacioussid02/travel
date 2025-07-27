@@ -18,7 +18,7 @@ export default function Home() {
             Sidoni
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Unlock your next extraordinary journey. We're not just another travel agent; we are your personal AI-powered guide. While others offer generic packages, our intelligent platform crafts unique, tailor-made itineraries in seconds, perfectly matching your travel style.
+            Unlock your next extraordinary journey. We're not just another travel agent; our intelligent platform crafts unique, tailor-made itineraries in seconds, perfectly matching your travel style.
           </p>
         </section>
 
