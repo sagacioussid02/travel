@@ -13,8 +13,8 @@ import {
   RefreshCw,
   TriangleAlert,
 } from 'lucide-react';
-import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { app } from '@/lib/firebase';
+import { onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -73,23 +73,22 @@ export default function ItineraryGenerator() {
   const [generationCount, setGenerationCount] = useState(0);
   const [showLimitDialog, setShowLimitDialog] = useState(false);
   const { toast } = useToast();
-  const auth = getAuth(app);
 
   useEffect(() => {
+    // For client-side localStorage access
+    const storedCount = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+    setGenerationCount(storedCount);
+    
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (!currentUser) {
-        // Only track generations for non-logged-in users
-        const storedCount = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
-        setGenerationCount(storedCount);
-      } else {
-        // Reset or ignore count for logged-in users
-        setGenerationCount(0);
+      if (currentUser) {
+        // User is logged in, no need to track generation count
         localStorage.removeItem(STORAGE_KEY);
+        setGenerationCount(0);
       }
     });
     return () => unsubscribe();
-  }, [auth]);
+  }, []);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),

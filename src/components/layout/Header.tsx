@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
-import { app } from '@/lib/firebase';
+import { onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { PaperPlaneIcon } from './PaperPlaneIcon';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -11,14 +11,13 @@ import { LogOut, User as UserIcon } from 'lucide-react';
 
 export function Header() {
   const [user, setUser] = useState<User | null>(null);
-  const auth = getAuth(app);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
     return () => unsubscribe();
-  }, [auth]);
+  }, []);
 
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
