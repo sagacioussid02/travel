@@ -102,8 +102,6 @@ export default function ItineraryGenerator() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithRedirect(auth, provider);
-      // The redirect will cause the page to reload, so we don't need to do anything here.
-      // The onAuthStateChanged listener will handle the user state.
     } catch (error) {
       console.error("Error during sign-in:", error);
       toast({
