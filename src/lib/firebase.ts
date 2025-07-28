@@ -2,12 +2,12 @@ import { initializeApp, getApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  apiKey: "AIzaSyBOvifi-9GbjLYRgunC6ZWaC-sGQTD2xcM",
+  authDomain: "sidoni-ai.firebaseapp.com",
+  projectId: "sidoni-ai",
+  storageBucket: "sidoni-ai.firebasestorage.app",
+  messagingSenderId: "1078070784045",
+  appId: "1:1078070784045:web:cbb2a74e075e96317148a4"
 };
 
 // Initialize Firebase
