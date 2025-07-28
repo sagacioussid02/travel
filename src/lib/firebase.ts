@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBOvifi-9GbjLYRgunC6ZWaC-sGQTD2xcM",
-  authDomain: "binosusai.com",
+  authDomain: "binosusai.firebaseapp.com",
   projectId: "binosusai",
   storageBucket: "binosusai.appspot.com",
   messagingSenderId: "1078070784045",
