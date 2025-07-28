@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,7 +11,10 @@ import {
   CalendarDays,
   Sparkles,
   RefreshCw,
+  TriangleAlert,
 } from 'lucide-react';
+import { getAuth, onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { app } from '@/lib/firebase';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -31,9 +34,18 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { generateItinerary, reviseItinerary } from '@/app/actions';
-import { ScrollArea } from '../ui/scroll-area';
 import { ItineraryTable } from './ItineraryTable';
 import type { ItineraryItem } from '@/lib/types';
 
@@ -49,12 +61,35 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+const GENERATION_LIMIT = 3;
+const STORAGE_KEY = 'itineraryGenerationCount';
+
 export default function ItineraryGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRevising, setIsRevising] = useState(false);
   const [itinerary, setItinerary] = useState<ItineraryItem[] | null>(null);
   const [formValues, setFormValues] = useState<FormData | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [generationCount, setGenerationCount] = useState(0);
+  const [showLimitDialog, setShowLimitDialog] = useState(false);
   const { toast } = useToast();
+  const auth = getAuth(app);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (!currentUser) {
+        // Only track generations for non-logged-in users
+        const storedCount = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+        setGenerationCount(storedCount);
+      } else {
+        // Reset or ignore count for logged-in users
+        setGenerationCount(0);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    });
+    return () => unsubscribe();
+  }, [auth]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -64,7 +99,28 @@ export default function ItineraryGenerator() {
     },
   });
 
+  const handleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      setShowLimitDialog(false); // Close dialog on successful login
+    } catch (error) {
+      console.error("Error during sign-in:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: 'Could not log you in. Please try again.',
+      });
+    }
+  };
+
+
   async function onSubmit(values: FormData) {
+    if (!user && generationCount >= GENERATION_LIMIT) {
+      setShowLimitDialog(true);
+      return;
+    }
+
     setIsLoading(true);
     setItinerary(null);
     setFormValues(values);
@@ -73,6 +129,11 @@ export default function ItineraryGenerator() {
 
     if (result.success) {
       setItinerary(result.data);
+      if (!user) {
+        const newCount = generationCount + 1;
+        setGenerationCount(newCount);
+        localStorage.setItem(STORAGE_KEY, newCount.toString());
+      }
     } else {
       toast({
         variant: 'destructive',
@@ -109,136 +170,161 @@ export default function ItineraryGenerator() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Card className="shadow-lg border-2 border-primary/20">
-        <CardHeader>
-          <CardTitle className="font-headline text-2xl flex items-center gap-2">
-            <Sparkles className="text-primary" />
-            Create Your Dream Trip
-          </CardTitle>
-          <CardDescription>
-            Enter your destination and we'll generate a personalized itinerary
-            for you.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FormField
-                  control={form.control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>Destination City</FormLabel>
-                      <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., Paris, Tokyo, Rome"
-                            {...field}
-                            className="pl-10"
-                          />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="numberOfDays"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Duration (days)</FormLabel>
-                       <div className="relative">
-                        <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <FormControl>
-                          <Input type="number" placeholder="e.g., 3" {...field} className="pl-10" />
-                        </FormControl>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full md:w-auto font-bold"
-                size="lg"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  'Generate Itinerary'
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-
-      {isLoading && (
-        <Card className="mt-8">
+    <>
+      <div className="max-w-4xl mx-auto">
+        <Card className="shadow-lg border-2 border-primary/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bot className="h-6 w-6 animate-pulse" /> Crafting your adventure...
+            <CardTitle className="font-headline text-2xl flex items-center gap-2">
+              <Sparkles className="text-primary" />
+              Create Your Dream Trip
             </CardTitle>
             <CardDescription>
-              Our AI is exploring the best spots for your trip. Please wait a moment.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="h-4 bg-muted rounded w-3/4 animate-pulse"></div>
-              <div className="h-4 bg-muted rounded w-1/2 animate-pulse"></div>
-            </div>
-             <div className="space-y-2">
-              <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
-              <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {itinerary && (
-        <Card className="mt-8 shadow-lg">
-          <CardHeader>
-            <CardTitle className="font-headline text-3xl">
-              Your Itinerary for {formValues?.city}
-            </CardTitle>
-            <CardDescription>
-              Here is a suggested plan for your {formValues?.numberOfDays}-day trip.
+              Enter your destination and we'll generate a personalized itinerary
+              for you.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ItineraryTable itinerary={itinerary} />
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel>Destination City</FormLabel>
+                        <div className="relative">
+                          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Paris, Tokyo, Rome"
+                              {...field}
+                              className="pl-10"
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="numberOfDays"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Duration (days)</FormLabel>
+                        <div className="relative">
+                          <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          <FormControl>
+                            <Input type="number" placeholder="e.g., 3" {...field} className="pl-10" />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full md:w-auto font-bold"
+                  size="lg"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    'Generate Itinerary'
+                  )}
+                </Button>
+              </form>
+            </Form>
           </CardContent>
-          <CardFooter>
-            <Button
-              onClick={handleRevise}
-              disabled={isRevising}
-              variant="outline"
-            >
-              {isRevising ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Revising...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Revise Itinerary
-                </>
-              )}
-            </Button>
-          </CardFooter>
         </Card>
-      )}
-    </div>
+
+        {isLoading && (
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="h-6 w-6 animate-pulse" /> Crafting your adventure...
+              </CardTitle>
+              <CardDescription>
+                Our AI is exploring the best spots for your trip. Please wait a moment.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="h-4 bg-muted rounded w-3/4 animate-pulse"></div>
+                <div className="h-4 bg-muted rounded w-1/2 animate-pulse"></div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 bg-muted rounded w-full animate-pulse"></div>
+                <div className="h-4 bg-muted rounded w-5/6 animate-pulse"></div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {itinerary && (
+          <Card className="mt-8 shadow-lg">
+            <CardHeader>
+              <CardTitle className="font-headline text-3xl">
+                Your Itinerary for {formValues?.city}
+              </CardTitle>
+              <CardDescription>
+                Here is a suggested plan for your {formValues?.numberOfDays}-day trip.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ItineraryTable itinerary={itinerary} />
+            </CardContent>
+            <CardFooter>
+              <Button
+                onClick={handleRevise}
+                disabled={isRevising}
+                variant="outline"
+              >
+                {isRevising ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Revising...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Revise Itinerary
+                  </>
+                )}
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
+      </div>
+
+      <AlertDialog open={showLimitDialog} onOpenChange={setShowLimitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <TriangleAlert className="text-primary" />
+              You've reached your free limit
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              To generate unlimited itineraries and save your travel plans, please log in or create a free account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Maybe Later</AlertDialogCancel>
+            <Button variant="outline" asChild>
+                <a href="https://binosusai.com" target="_blank" rel="noopener noreferrer">Sign Up</a>
+            </Button>
+            <AlertDialogAction onClick={handleLogin}>
+              Login with Google
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
