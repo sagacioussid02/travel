@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,10 +11,7 @@ import {
   CalendarDays,
   Sparkles,
   RefreshCw,
-  TriangleAlert,
 } from 'lucide-react';
-import { onAuthStateChanged, User, signInWithRedirect, GoogleAuthProvider } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -34,16 +31,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { generateItinerary, reviseItinerary } from '@/app/actions';
 import { ItineraryTable } from './ItineraryTable';
@@ -61,34 +48,12 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-const GENERATION_LIMIT = 3;
-const STORAGE_KEY = 'itineraryGenerationCount';
-
 export default function ItineraryGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRevising, setIsRevising] = useState(false);
   const [itinerary, setItinerary] = useState<ItineraryItem[] | null>(null);
   const [formValues, setFormValues] = useState<FormData | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [generationCount, setGenerationCount] = useState(0);
-  const [showLimitDialog, setShowLimitDialog] = useState(false);
   const { toast } = useToast();
-
-  useEffect(() => {
-    // For client-side localStorage access
-    const storedCount = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
-    setGenerationCount(storedCount);
-    
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        // User is logged in, no need to track generation count
-        localStorage.removeItem(STORAGE_KEY);
-        setGenerationCount(0);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -98,27 +63,7 @@ export default function ItineraryGenerator() {
     },
   });
 
-  const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithRedirect(auth, provider);
-    } catch (error) {
-      console.error("Error during sign-in:", error);
-      toast({
-        variant: 'destructive',
-        title: 'Login Failed',
-        description: 'Could not initiate login. Please try again.',
-      });
-    }
-  };
-
-
   async function onSubmit(values: FormData) {
-    if (!user && generationCount >= GENERATION_LIMIT) {
-      setShowLimitDialog(true);
-      return;
-    }
-
     setIsLoading(true);
     setItinerary(null);
     setFormValues(values);
@@ -127,11 +72,6 @@ export default function ItineraryGenerator() {
 
     if (result.success) {
       setItinerary(result.data);
-      if (!user) {
-        const newCount = generationCount + 1;
-        setGenerationCount(newCount);
-        localStorage.setItem(STORAGE_KEY, newCount.toString());
-      }
     } else {
       toast({
         variant: 'destructive',
@@ -300,29 +240,6 @@ export default function ItineraryGenerator() {
           </Card>
         )}
       </div>
-
-      <AlertDialog open={showLimitDialog} onOpenChange={setShowLimitDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <TriangleAlert className="text-primary" />
-              You've reached your free limit
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              To generate unlimited itineraries and save your travel plans, please log in or create a free account.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Maybe Later</AlertDialogCancel>
-            <Button variant="outline" asChild>
-                <a href="https://binosusai.com" target="_blank" rel="noopener noreferrer">Sign Up</a>
-            </Button>
-            <AlertDialogAction onClick={handleLogin}>
-              Login with Google
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
