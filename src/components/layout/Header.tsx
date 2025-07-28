@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { onAuthStateChanged, User, signInWithRedirect, GoogleAuthProvider, signOut, getRedirectResult } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { PaperPlaneIcon } from './PaperPlaneIcon';
 import { Button } from '@/components/ui/button';
@@ -21,31 +21,11 @@ export function Header() {
       setIsLoading(false);
     });
     
-    getRedirectResult(auth)
-      .catch((error) => {
-        console.error("Error during sign-in redirect:", error);
-        toast({
-          variant: 'destructive',
-          title: 'Login Failed',
-          description: error.message || 'Could not log you in via redirect. Please try again.',
-        });
-      });
-
     return () => unsubscribe();
   }, [toast]);
 
-  const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithRedirect(auth, provider);
-    } catch (error) {
-      console.error("Error during sign-in:", error);
-       toast({
-        variant: 'destructive',
-        title: 'Login Failed',
-        description: 'Could not initiate login. Please try again.',
-      });
-    }
+  const handleLogin = () => {
+    window.location.href = 'https://binosusai.com';
   };
 
   const handleLogout = async () => {
