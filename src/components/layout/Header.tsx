@@ -1,30 +1,50 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { onAuthStateChanged, User, signInWithRedirect, GoogleAuthProvider, signOut, getRedirectResult } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { PaperPlaneIcon } from './PaperPlaneIcon';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export function Header() {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setIsLoading(false);
     });
+    
+    getRedirectResult(auth)
+      .catch((error) => {
+        console.error("Error during sign-in redirect:", error);
+        toast({
+          variant: 'destructive',
+          title: 'Login Failed',
+          description: error.message || 'Could not log you in via redirect. Please try again.',
+        });
+      });
+
     return () => unsubscribe();
-  }, []);
+  }, [toast]);
 
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      await signInWithRedirect(auth, provider);
     } catch (error) {
       console.error("Error during sign-in:", error);
+       toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: 'Could not initiate login. Please try again.',
+      });
     }
   };
 
@@ -51,7 +71,9 @@ export function Header() {
           </a>
         </div>
         <div className="flex items-center gap-2">
-          {user ? (
+          {isLoading ? (
+            <Loader2 className="h-6 w-6 animate-spin" />
+          ) : user ? (
              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">

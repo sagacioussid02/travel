@@ -13,7 +13,7 @@ import {
   RefreshCw,
   TriangleAlert,
 } from 'lucide-react';
-import { onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { onAuthStateChanged, User, signInWithRedirect, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 import { Button } from '@/components/ui/button';
@@ -101,14 +101,15 @@ export default function ItineraryGenerator() {
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      setShowLimitDialog(false); // Close dialog on successful login
+      await signInWithRedirect(auth, provider);
+      // The redirect will cause the page to reload, so we don't need to do anything here.
+      // The onAuthStateChanged listener will handle the user state.
     } catch (error) {
       console.error("Error during sign-in:", error);
       toast({
         variant: 'destructive',
         title: 'Login Failed',
-        description: 'Could not log you in. Please try again.',
+        description: 'Could not initiate login. Please try again.',
       });
     }
   };
