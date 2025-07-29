@@ -36,7 +36,7 @@ export function ItineraryTable({ itinerary }: ItineraryTableProps) {
         {itinerary.map((item, index) => (
           <TableRow key={index}>
             <TableCell className="font-medium">{item.day}</TableCell>
-            <TableCell>{item.time}</TableCell>
+            <TableCell>{item.startTime} - {item.endTime}</TableCell>
             <TableCell>{item.spot}</TableCell>
             <TableCell>{item.thingsToDo}</TableCell>
             <TableCell>

@@ -10,6 +10,7 @@ import type { ItineraryItem } from '@/lib/types';
 import {
   CalendarDays,
   ChevronDown,
+  Clock,
   Lightbulb,
   MapPin,
   MessageSquare,
@@ -116,7 +117,10 @@ function ItineraryDayCard({ item }: { item: ItineraryItem }) {
             Day {item.day}
           </Badge>
           <h4 className="text-lg font-bold font-headline">{item.spot}</h4>
-          <p className="text-sm text-muted-foreground">{item.time}</p>
+          <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5"/>
+            {item.startTime} - {item.endTime}
+          </p>
         </div>
         {item.optionalSpots && item.optionalSpots.length > 0 && (
           <DropdownMenu>

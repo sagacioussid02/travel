@@ -11,6 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import {cache} from 'react';
+import { getLocationDetails } from '../tools/location-tools';
 
 const PopulateDefaultItinerariesInputSchema = z.object({
   destination: z.string().describe('The destination for the travel itinerary.'),
@@ -25,7 +26,8 @@ const OptionalSpotSchema = z.object({
 
 const ItineraryItemSchema = z.object({
   day: z.number().describe('The day of the itinerary.'),
-  time: z.string().describe('A granular time for the activity (e.g., "9:00 AM").'),
+  startTime: z.string().describe('The start time for the activity (e.g., "9:00 AM").'),
+  endTime: z.string().describe('The end time for the activity (e.g., "11:00 AM").'),
   spot: z.string().describe('The name of the main recommended location or attraction.'),
   thingsToDo: z.string().describe('A description of activities at the main location.'),
   ticketInfo: z.string().describe('Information on how to get tickets, if applicable.'),
@@ -52,6 +54,7 @@ const prompt = ai.definePrompt({
   name: 'populateDefaultItinerariesPrompt',
   input: {schema: PopulateDefaultItinerariesInputSchema},
   output: {schema: PopulateDefaultItinerariesOutputSchema},
+  tools: [getLocationDetails],
   prompt: `You are an AI travel agent that specializes in creating travel itineraries.
 
   Create a travel itinerary for the following destination: {{{destination}}}
@@ -59,13 +62,16 @@ const prompt = ai.definePrompt({
 
   The itinerary should include the following information for each item:
   - day: The day of the itinerary.
-  - time: A granular time for the activity (e.g., "9:00 AM").
+  - startTime: The start time for the activity (e.g., "9:00 AM").
+  - endTime: The end time for the activity (e.g., "11:00 AM").
   - spot: The main recommended location or attraction.
   - thingsToDo: A description of activities at the main location.
   - ticketInfo: Information on how to get tickets, if applicable.
   - facts: Interesting facts about the place.
   - reviews: Recent reviews from a trusted site like Google.
   - optionalSpots: A list of optional nearby places to visit with a short description.
+  
+  To create a realistic schedule, you must use the getLocationDetails tool to get the travel time between locations and the average time required to visit each spot.
   `,
 });
 

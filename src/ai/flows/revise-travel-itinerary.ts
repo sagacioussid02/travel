@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { getLocationDetails } from '../tools/location-tools';
 
 const ReviseTravelItineraryInputSchema = z.object({
   city: z.string().describe('The city or town the user will be visiting.'),
@@ -24,7 +25,8 @@ const OptionalSpotSchema = z.object({
 
 const ItineraryItemSchema = z.object({
   day: z.number().describe('The day of the itinerary.'),
-  time: z.string().describe('A granular time for the activity (e.g., "9:00 AM").'),
+  startTime: z.string().describe('The start time for the activity (e.g., "9:00 AM").'),
+  endTime: z.string().describe('The end time for the activity (e.g., "11:00 AM").'),
   spot: z.string().describe('The name of the main recommended location or attraction.'),
   thingsToDo: z.string().describe('A description of activities at the main location.'),
   ticketInfo: z.string().describe('Information on how to get tickets, if applicable.'),
@@ -46,6 +48,7 @@ const prompt = ai.definePrompt({
   name: 'reviseTravelItineraryPrompt',
   input: {schema: ReviseTravelItineraryInputSchema},
   output: {schema: ReviseTravelItineraryOutputSchema},
+  tools: [getLocationDetails],
   prompt: `You are an AI travel agent. The user wants you to revise their travel itinerary.
 
   City: {{{city}}}
@@ -56,10 +59,10 @@ const prompt = ai.definePrompt({
   {{previousItinerary}}
   {% endif %}
 
-  Create a new itinerary with a different arrangement of travel spots considering the city and duration. 
+  Create a new, logically sequenced itinerary with a different arrangement of travel spots considering the city and duration. 
   
   For each itinerary item, provide:
-  - A granular time (e.g., "9:00 AM", "1:00 PM").
+  - A start and end time for each activity. You must account for the travel time between locations and the average time required to visit each spot. Use the getLocationDetails tool to get this information.
   - One main suggested spot with things to do, ticket info, facts, and reviews.
   - A few optional spots nearby that the user could visit as alternatives.
   `,

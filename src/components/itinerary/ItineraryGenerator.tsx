@@ -60,6 +60,8 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
+const GENERATION_INFO_KEY = 'generationInfo';
+const TWELVE_HOURS_IN_MS = 12 * 60 * 60 * 1000;
 
 export default function ItineraryGenerator() {
   const [isLoading, setIsLoading] = useState(false);
@@ -82,6 +84,28 @@ export default function ItineraryGenerator() {
     return () => unsubscribe();
   }, [auth]);
 
+  useEffect(() => {
+    const storedInfoRaw = localStorage.getItem(GENERATION_INFO_KEY);
+    if (storedInfoRaw) {
+      try {
+        const storedInfo = JSON.parse(storedInfoRaw);
+        const { count, timestamp } = storedInfo;
+        const now = Date.now();
+
+        if (now - timestamp > TWELVE_HOURS_IN_MS) {
+          // More than 12 hours have passed, reset the count.
+          localStorage.removeItem(GENERATION_INFO_KEY);
+          setGenerationCount(0);
+        } else {
+          setGenerationCount(count);
+        }
+      } catch (error) {
+        // If parsing fails, remove the invalid item.
+        localStorage.removeItem(GENERATION_INFO_KEY);
+      }
+    }
+  }, []);
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -99,7 +123,15 @@ export default function ItineraryGenerator() {
     setIsLoading(true);
     setItinerary(null);
     setFormValues(values);
-    setGenerationCount((prevCount) => prevCount + 1);
+    
+    const newCount = generationCount + 1;
+    setGenerationCount(newCount);
+    const newInfo = {
+        count: newCount,
+        timestamp: Date.now(),
+    };
+    localStorage.setItem(GENERATION_INFO_KEY, JSON.stringify(newInfo));
+
 
     const result = await generateItinerary(values);
 

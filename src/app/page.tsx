@@ -8,6 +8,7 @@ import { InstagramReels } from '@/components/instagram/InstagramReels';
 import * as React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import AdBanner from '@/components/ads/AdBanner';
+import AdminDashboard from '@/components/admin/AdminDashboard';
 
 export default function Home() {
   return (
@@ -22,6 +23,8 @@ export default function Home() {
             Unlock your next extraordinary journey. Our intelligent platform crafts unique, tailor-made itineraries in seconds, perfectly matching your travel style.
           </p>
         </section>
+
+        <AdminDashboard />
 
         <ItineraryGenerator />
 

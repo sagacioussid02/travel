@@ -66,3 +66,5 @@ The application uses AI agents defined in the `src/ai/flows` directory. These ar
 ### A Note on "Personal MCP Server"
 
 The user asked about a "personal MCP server regarding the city details". This application does not require a personal server for city data. The AI models used (like Google's Gemini) are pre-trained on a vast amount of text and data from the internet, which includes extensive knowledge about cities, landmarks, and travel information. The application securely communicates with Google's AI services via APIs, which are managed by the Genkit library, to access this knowledge and generate itineraries.
+
+The `getLocationDetails` tool in `src/ai/tools/location-tools.ts` is currently a **simulation** that uses hardcoded data for popular landmarks. This allows the AI to create realistic schedules without needing a real-time Maps API key. This design makes it easy to integrate a real data source in the future without changing the core AI logic.
