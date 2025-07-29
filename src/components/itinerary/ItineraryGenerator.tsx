@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -31,10 +31,23 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { generateItinerary, reviseItinerary } from '@/app/actions';
 import { ItineraryTable } from './ItineraryTable';
 import type { ItineraryItem } from '@/lib/types';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+import { app } from '@/lib/firebase';
+import { Header } from '../layout/Header';
 
 const formSchema = z.object({
   city: z.string().min(2, {
@@ -54,7 +67,20 @@ export default function ItineraryGenerator() {
   const [itinerary, setItinerary] = useState<ItineraryItem[] | null>(null);
   const [formValues, setFormValues] = useState<FormData | null>(null);
   const [generationCount, setGenerationCount] = useState(0);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
+  const auth = getAuth(app);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        setShowLoginPrompt(false);
+      }
+    });
+    return () => unsubscribe();
+  }, [auth]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -65,6 +91,11 @@ export default function ItineraryGenerator() {
   });
 
   async function onSubmit(values: FormData) {
+    if (generationCount >= 3 && !user) {
+        setShowLoginPrompt(true);
+        return;
+    }
+
     setIsLoading(true);
     setItinerary(null);
     setFormValues(values);
@@ -181,7 +212,7 @@ export default function ItineraryGenerator() {
                     )}
                   </Button>
                   <p className="text-sm text-muted-foreground">
-                    Generations: {generationCount}
+                    Generations: {generationCount} / 3 Free Generations
                   </p>
                 </div>
               </form>
@@ -247,6 +278,23 @@ export default function ItineraryGenerator() {
           </Card>
         )}
       </div>
+
+      <AlertDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
+          <AlertDialogContent>
+              <AlertDialogHeader>
+                  <AlertDialogTitle>Login to Continue</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      You have used all your free itinerary generations. Please log in to continue creating amazing travel plans with Sidoni.
+                  </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="flex justify-center py-4">
+                <Header />
+              </div>
+              <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
