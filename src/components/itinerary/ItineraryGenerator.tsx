@@ -53,6 +53,7 @@ export default function ItineraryGenerator() {
   const [isRevising, setIsRevising] = useState(false);
   const [itinerary, setItinerary] = useState<ItineraryItem[] | null>(null);
   const [formValues, setFormValues] = useState<FormData | null>(null);
+  const [generationCount, setGenerationCount] = useState(0);
   const { toast } = useToast();
 
   const form = useForm<FormData>({
@@ -67,6 +68,7 @@ export default function ItineraryGenerator() {
     setIsLoading(true);
     setItinerary(null);
     setFormValues(values);
+    setGenerationCount((prevCount) => prevCount + 1);
 
     const result = await generateItinerary(values);
 
@@ -162,21 +164,26 @@ export default function ItineraryGenerator() {
                     )}
                   />
                 </div>
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full md:w-auto font-bold"
-                  size="lg"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    'Generate Itinerary'
-                  )}
-                </Button>
+                <div className="flex flex-col md:flex-row items-center gap-4">
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full md:w-auto font-bold"
+                    size="lg"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      'Generate Itinerary'
+                    )}
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    Generations: {generationCount}
+                  </p>
+                </div>
               </form>
             </Form>
           </CardContent>
