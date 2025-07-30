@@ -13,27 +13,7 @@ async function updateItineraryPrompt(newContent: string) {
         // This is a simple but fragile way to inject content.
         // In a real-world app, you'd use a more robust template engine or AST manipulation.
         const marker = '---';
-        const insertionPoint = originalContent.lastIndexOf(marker);
-
-        if (insertionPoint === -1) {
-            throw new Error('Could not find the insertion point in the prompt file.');
-        }
-
-        const customDataBlock = `
-  CUSTOM TRAVEL BLOG DATA:
-  ${newContent}
-`;
-
-        const newFileContent = originalContent.substring(0, insertionPoint) + marker + customDataBlock + '\n`,\n});';
         
-        // This is a simplified search and replace for the final part of the file.
-        // A more robust solution is needed for production.
-        const finalContent = originalContent.replace(
-            /(---\n)(.|\n)*?(`,\n}\);)/, 
-            `$1\n${customDataBlock}\n$3`
-        );
-
-
         // A simple text injection - might not be robust
         const promptStart = "prompt: `";
         const promptEnd = "`,";
