@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from 'next/server';
 import pdf from 'pdf-parse/lib/pdf-parse.js';
-import *s as fs from 'fs/promises';
-import *s as path from 'path';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 // Helper function to safely update the prompt file
 async function updateItineraryPrompt(newContent: string) {
