@@ -1,0 +1,11 @@
+.git
+.next
+public
+node_modules
+dist
+apikeys.txt
+*.key
+*.pem
+*.lock
+.cache
+coverage

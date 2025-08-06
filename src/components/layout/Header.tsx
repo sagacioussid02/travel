@@ -21,7 +21,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut } from 'lucide-react';
+import { LogOut, Package } from 'lucide-react';
+import Link from 'next/link';
 
 export function Header() {
   const [user, setUser] = useState<User | null>(null);
@@ -65,7 +66,13 @@ export function Header() {
             Sidoni
           </a>
         </div>
-        <div>
+        <div className="flex items-center gap-4">
+          <Link href="/travelkit" passHref>
+            <Button variant="ghost">
+              <Package className="mr-2 h-4 w-4" />
+              Travel Toolkit
+            </Button>
+          </Link>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
