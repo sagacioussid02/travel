@@ -9,15 +9,21 @@ export function PaperPlaneIcon({ className }: { className?: string }) {
       width="24"
       height="24"
     >
+      <defs>
+        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{ stopColor: '#f97316' }} />
+          <stop offset="50%" style={{ stopColor: '#ec4899' }} />
+          <stop offset="100%" style={{ stopColor: '#a855f7' }} />
+        </linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="48" fill="url(#logoGradient)" />
       <path
-        d="M10 10 L90 50 L10 90 L30 50 Z"
-        fill="#a855f7"
-        stroke="white"
-        strokeWidth="2"
+        d="M69.92,37.33,37.42,69.83a4.27,4.27,0,0,1-6-6l32.5-32.5a4.27,4.27,0,0,1,6,6Z"
+        fill="white"
       />
-      <path 
-        d="M30 50 L90 50 L50 70 Z" 
-        fill="#e9d5ff"
+      <path
+        d="M37.42,30.17,30.08,37.5a4.27,4.27,0,0,0,0,6l7.33,7.34a4.27,4.27,0,0,0,6,0l7.34-7.34a4.27,4.27,0,0,0,0-6L43.42,30.17a4.27,4.27,0,0,0-6,0Z"
+        fill="white"
       />
     </svg>
   );

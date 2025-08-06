@@ -177,7 +177,7 @@ export default function ItineraryGenerator() {
       <div className="max-w-4xl mx-auto">
         <Card className="shadow-lg border-2 border-primary/20">
           <CardHeader>
-            <CardTitle className="font-headline text-2xl flex items-center gap-2">
+            <CardTitle className="font-handwriting text-3xl flex items-center gap-2">
               <Sparkles className="text-primary" />
               Create Your Dream Trip
             </CardTitle>

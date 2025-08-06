@@ -11,6 +11,11 @@ export default function TravelKitPage() {
       <Header />
       <main className="container mx-auto px-4 py-8 md:py-12 flex-grow w-full">
         <section className="text-center mb-12">
+          <div className="mb-4">
+            <span className="inline-block bg-primary/20 text-primary animate-pulse rounded-full px-4 py-1 text-sm font-semibold tracking-wider">
+              COMING SOON
+            </span>
+          </div>
           <h1 className="text-4xl md:text-6xl font-bold font-headline mb-4 text-foreground">
             ✈️ Travel Toolkit Bundle
           </h1>
@@ -62,6 +67,11 @@ export default function TravelKitPage() {
         </div>
 
         <section className="mt-20 md:mt-28 text-center">
+            <div className="mb-4">
+              <span className="inline-block bg-primary/20 text-primary animate-pulse rounded-full px-4 py-1 text-sm font-semibold tracking-wider">
+                COMING SOON
+              </span>
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold font-headline text-center mb-10 text-foreground">
                 Get Your Toolkit
             </h2>

@@ -9,7 +9,6 @@ import { ShieldCheck } from 'lucide-react';
 
 const whitelistedEmails = [
   'siddharthuncc@gmail.com',
-  'sidoni.creation@gmail.com',
 ];
 
 export default function AdminDashboard() {

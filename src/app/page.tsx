@@ -14,16 +14,18 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background/80">
       <Header />
-      <main className="container mx-auto px-4 py-8 md:py-12 flex-grow w-full">
-        <section className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold font-headline mb-4 text-foreground">
+      <main className="container mx-auto px-4 py-2 md:py-4 flex-grow w-full">
+        <section className="text-center mb-4 md:mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold font-handwriting mb-4 text-foreground">
             Sidoni
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Unlock your next extraordinary journey. Our intelligent platform crafts unique, tailor-made itineraries in seconds, perfectly matching your travel style.
+          <p className="text-xl md:text-2xl font-handwriting max-w-3xl mx-auto bg-gradient-to-r from-primary via-pink-500 to-orange-500 text-transparent bg-clip-text">
+            Unlock your next extraordinary journey. Our intelligent platform crafts
+            unique, tailor-made itineraries in seconds, perfectly matching your
+            travel style.
           </p>
         </section>
-
+        
         <AdminDashboard />
 
         <ItineraryGenerator />
