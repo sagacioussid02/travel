@@ -38,7 +38,7 @@ export function InstagramReels() {
       <div className="w-full max-w-4xl rounded-lg border bg-card text-card-foreground shadow-sm text-center p-6">
         <h3 className="text-2xl font-semibold leading-none tracking-tight mb-4">
           <a
-            href="https://www.instagram.com/sidoni_clickz/reels/"
+            href="https://www.instagram.com/travelwithsidoni/reels/"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-primary hover:underline"
@@ -67,7 +67,7 @@ export function InstagramReels() {
                 className="pl-4 md:basis-1/2 lg:basis-1/3"
               >
                 <a
-                  href="https://www.instagram.com/sidoni_clickz/reels/"
+                  href="https://www.instagram.com/travelwithsidoni/reels/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block"
@@ -111,7 +111,7 @@ export function InstagramReels() {
 
         <div className="mt-4">
           <a
-            href="https://www.instagram.com/sidoni_clickz/reels/"
+            href="https://www.instagram.com/travelwithsidoni/reels/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-primary hover:underline"

@@ -115,7 +115,7 @@ export default function ItineraryGenerator() {
   });
 
   async function onSubmit(values: FormData) {
-    if (generationCount >= 3 && !user) {
+    if (generationCount >= 1 && !user) {
         setShowLoginPrompt(true);
         return;
     }
@@ -124,13 +124,15 @@ export default function ItineraryGenerator() {
     setItinerary(null);
     setFormValues(values);
     
-    const newCount = generationCount + 1;
-    setGenerationCount(newCount);
-    const newInfo = {
-        count: newCount,
-        timestamp: Date.now(),
-    };
-    localStorage.setItem(GENERATION_INFO_KEY, JSON.stringify(newInfo));
+    if (!user) {
+        const newCount = generationCount + 1;
+        setGenerationCount(newCount);
+        const newInfo = {
+            count: newCount,
+            timestamp: Date.now(),
+        };
+        localStorage.setItem(GENERATION_INFO_KEY, JSON.stringify(newInfo));
+    }
 
 
     const result = await generateItinerary(values);
@@ -243,9 +245,11 @@ export default function ItineraryGenerator() {
                       'Generate Itinerary'
                     )}
                   </Button>
-                  <p className="text-sm text-muted-foreground">
-                    Generations: {generationCount} / 3 Free Generations
-                  </p>
+                  {!user && (
+                    <p className="text-sm text-muted-foreground">
+                      {generationCount} / 1 Free Generation Used
+                    </p>
+                  )}
                 </div>
               </form>
             </Form>
@@ -316,7 +320,7 @@ export default function ItineraryGenerator() {
               <AlertDialogHeader>
                   <AlertDialogTitle>Login to Continue</AlertDialogTitle>
                   <AlertDialogDescription>
-                      You have used all your free itinerary generations. Please log in to continue creating amazing travel plans with Sidoni.
+                      You have used your free itinerary generation. Please log in to continue creating amazing travel plans with Sidoni.
                   </AlertDialogDescription>
               </AlertDialogHeader>
               <div className="flex justify-center py-4">

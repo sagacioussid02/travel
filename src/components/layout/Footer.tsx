@@ -8,13 +8,13 @@ export function Footer() {
           &copy; 2025 Binosus. All rights reserved.
         </p>
         <a 
-          href="https://instagram.com/sidoni_clickz" 
+          href="https://instagram.com/travelwithsidoni" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="flex items-center gap-2 hover:text-primary transition-colors"
         >
           <Instagram className="w-4 h-4" />
-          @sidoni_clickz
+          @travelwithsidoni
         </a>
       </div>
     </footer>
