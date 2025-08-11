@@ -11,6 +11,7 @@ import {
   CalendarDays,
   Sparkles,
   RefreshCw,
+  CreditCard,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -60,7 +61,8 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
-const GENERATION_INFO_KEY = 'generationInfo';
+const GUEST_GENERATION_INFO_KEY = 'guestGenerationInfo';
+const USER_GENERATION_INFO_KEY = 'userGenerationInfo';
 const TWELVE_HOURS_IN_MS = 12 * 60 * 60 * 1000;
 
 export default function ItineraryGenerator() {
@@ -70,6 +72,7 @@ export default function ItineraryGenerator() {
   const [formValues, setFormValues] = useState<FormData | null>(null);
   const [generationCount, setGenerationCount] = useState(0);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showPaymentPrompt, setShowPaymentPrompt] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   const auth = getAuth(app);
@@ -79,32 +82,42 @@ export default function ItineraryGenerator() {
       setUser(currentUser);
       if (currentUser) {
         setShowLoginPrompt(false);
+        // Load generation count for the logged-in user
+        const storedInfoRaw = localStorage.getItem(`${USER_GENERATION_INFO_KEY}_${currentUser.uid}`);
+        if (storedInfoRaw) {
+          try {
+            const storedInfo = JSON.parse(storedInfoRaw);
+            setGenerationCount(storedInfo.count);
+          } catch {
+            localStorage.removeItem(`${USER_GENERATION_INFO_KEY}_${currentUser.uid}`);
+          }
+        } else {
+            setGenerationCount(0);
+        }
+      } else {
+        // Load generation count for guest
+        const storedInfoRaw = localStorage.getItem(GUEST_GENERATION_INFO_KEY);
+        if (storedInfoRaw) {
+            try {
+                const storedInfo = JSON.parse(storedInfoRaw);
+                const { count, timestamp } = storedInfo;
+                const now = Date.now();
+                if (now - timestamp > TWELVE_HOURS_IN_MS) {
+                    localStorage.removeItem(GUEST_GENERATION_INFO_KEY);
+                    setGenerationCount(0);
+                } else {
+                    setGenerationCount(count);
+                }
+            } catch {
+                localStorage.removeItem(GUEST_GENERATION_INFO_KEY);
+            }
+        } else {
+            setGenerationCount(0);
+        }
       }
     });
     return () => unsubscribe();
   }, [auth]);
-
-  useEffect(() => {
-    const storedInfoRaw = localStorage.getItem(GENERATION_INFO_KEY);
-    if (storedInfoRaw) {
-      try {
-        const storedInfo = JSON.parse(storedInfoRaw);
-        const { count, timestamp } = storedInfo;
-        const now = Date.now();
-
-        if (now - timestamp > TWELVE_HOURS_IN_MS) {
-          // More than 12 hours have passed, reset the count.
-          localStorage.removeItem(GENERATION_INFO_KEY);
-          setGenerationCount(0);
-        } else {
-          setGenerationCount(count);
-        }
-      } catch (error) {
-        // If parsing fails, remove the invalid item.
-        localStorage.removeItem(GENERATION_INFO_KEY);
-      }
-    }
-  }, []);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -115,25 +128,35 @@ export default function ItineraryGenerator() {
   });
 
   async function onSubmit(values: FormData) {
-    if (generationCount >= 1 && !user) {
-        setShowLoginPrompt(true);
-        return;
+    if (user) {
+        if (generationCount >= 1) {
+            setShowPaymentPrompt(true);
+            return;
+        }
+    } else {
+        if (generationCount >= 1) {
+            setShowLoginPrompt(true);
+            return;
+        }
     }
 
     setIsLoading(true);
     setItinerary(null);
     setFormValues(values);
     
-    if (!user) {
-        const newCount = generationCount + 1;
-        setGenerationCount(newCount);
-        const newInfo = {
+    const newCount = generationCount + 1;
+    setGenerationCount(newCount);
+
+    if (user) {
+        const userInfo = { count: newCount };
+        localStorage.setItem(`${USER_GENERATION_INFO_KEY}_${user.uid}`, JSON.stringify(userInfo));
+    } else {
+        const guestInfo = {
             count: newCount,
             timestamp: Date.now(),
         };
-        localStorage.setItem(GENERATION_INFO_KEY, JSON.stringify(newInfo));
+        localStorage.setItem(GUEST_GENERATION_INFO_KEY, JSON.stringify(guestInfo));
     }
-
 
     const result = await generateItinerary(values);
 
@@ -245,11 +268,9 @@ export default function ItineraryGenerator() {
                       'Generate Itinerary'
                     )}
                   </Button>
-                  {!user && (
                     <p className="text-sm text-muted-foreground">
                       {generationCount} / 1 Free Generation Used
                     </p>
-                  )}
                 </div>
               </form>
             </Form>
@@ -328,6 +349,24 @@ export default function ItineraryGenerator() {
               </div>
               <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showPaymentPrompt} onOpenChange={setShowPaymentPrompt}>
+          <AlertDialogContent>
+              <AlertDialogHeader>
+                  <AlertDialogTitle>Limit Reached</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      You have used your itinerary generation for this session. Please purchase for unlimited access.
+                  </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Proceed to Payment
+                  </AlertDialogAction>
               </AlertDialogFooter>
           </AlertDialogContent>
       </AlertDialog>
