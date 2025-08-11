@@ -17,9 +17,9 @@ import {
   GoogleAuthProvider,
   User,
 } from 'firebase/auth';
-import { app } from '@/lib/firebase';
+import { app, db } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-const PRO_STATUS_KEY_PREFIX = 'pro_status_';
 
 interface AuthContextType {
   user: User | null;
@@ -38,12 +38,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isPro, setIsPro] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        // Check for pro status in localStorage when user logs in
-        const proStatus = localStorage.getItem(`${PRO_STATUS_KEY_PREFIX}${currentUser.uid}`);
-        setIsPro(proStatus === 'true');
+        // Check for pro status in Firestore when user logs in
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists() && userDoc.data().isPro) {
+            setIsPro(true);
+        } else {
+            setIsPro(false);
+        }
       } else {
         // Reset pro status on logout
         setIsPro(false);
@@ -71,9 +76,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
   
-  const setUserAsPro = useCallback(() => {
+  const setUserAsPro = useCallback(async () => {
     if (user) {
-        localStorage.setItem(`${PRO_STATUS_KEY_PREFIX}${user.uid}`, 'true');
+        const userDocRef = doc(db, 'users', user.uid);
+        await setDoc(userDocRef, { isPro: true }, { merge: true });
         setIsPro(true);
     }
   }, [user]);

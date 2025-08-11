@@ -48,7 +48,7 @@ export default function CheckoutForm() {
         }
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         if (user) {
-            setUserAsPro();
+            await setUserAsPro();
         }
         toast({
             title: 'Payment Successful!',
