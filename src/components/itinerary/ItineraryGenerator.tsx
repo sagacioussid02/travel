@@ -12,8 +12,9 @@ import {
   CalendarDays,
   Sparkles,
   RefreshCw,
-  LogIn,
+  Zap,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -37,7 +38,6 @@ import { useToast } from '@/hooks/use-toast';
 import { generateItinerary, reviseItinerary } from '@/app/actions';
 import { ItineraryTable } from './ItineraryTable';
 import type { ItineraryItem } from '@/lib/types';
-import { useAuth } from '@/hooks/use-auth';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,9 +67,9 @@ export default function ItineraryGenerator() {
   const [itinerary, setItinerary] = useState<ItineraryItem[] | null>(null);
   const [formValues, setFormValues] = useState<FormData | null>(null);
   const { toast } = useToast();
-  const { user, handleLogin } = useAuth();
   const [generationCount, setGenerationCount] = useState(0);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showProPrompt, setShowProPrompt] = useState(false);
+  const router = useRouter();
 
 
   const form = useForm<FormData>({
@@ -81,8 +81,8 @@ export default function ItineraryGenerator() {
   });
 
   async function onSubmit(values: FormData) {
-    if (!user && generationCount >= 1) {
-      setShowLoginPrompt(true);
+    if (generationCount >= 1) {
+      setShowProPrompt(true);
       return;
     }
 
@@ -94,9 +94,7 @@ export default function ItineraryGenerator() {
 
     if (result.success) {
       setItinerary(result.data);
-      if (!user) {
-        setGenerationCount(prev => prev + 1);
-      }
+      setGenerationCount(prev => prev + 1);
     } else {
       toast({
         variant: 'destructive',
@@ -110,6 +108,11 @@ export default function ItineraryGenerator() {
   async function handleRevise() {
     if (!formValues || !itinerary) return;
 
+    if (generationCount >= 1) {
+      setShowProPrompt(true);
+      return;
+    }
+
     setIsRevising(true);
     const result = await reviseItinerary({
       city: formValues.city,
@@ -122,6 +125,7 @@ export default function ItineraryGenerator() {
         title: 'Itinerary Revised',
         description: 'Here is a new set of suggestions for your trip.',
       });
+      setGenerationCount(prev => prev + 1);
     } else {
       toast({
         variant: 'destructive',
@@ -143,7 +147,7 @@ export default function ItineraryGenerator() {
             </CardTitle>
             <CardDescription>
               Enter your destination and we'll generate a personalized itinerary
-              for you.
+              for you. Your first one is on us!
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -268,22 +272,22 @@ export default function ItineraryGenerator() {
         )}
       </div>
 
-       <AlertDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
+       <AlertDialog open={showProPrompt} onOpenChange={setShowProPrompt}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Login to Continue</AlertDialogTitle>
+            <AlertDialogTitle>Upgrade for Unlimited Access</AlertDialogTitle>
             <AlertDialogDescription>
-              You've used your free itinerary generation. Please log in to create unlimited travel plans.
+              You've used your free itinerary generation. Go Pro to create and revise unlimited travel plans!
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={async () => {
-                await handleLogin();
-                setShowLoginPrompt(false);
+            <AlertDialogAction onClick={() => {
+                router.push('/payment');
+                setShowProPrompt(false);
             }}>
-              <LogIn className="mr-2" />
-              Login
+              <Zap className="mr-2" />
+              Go Pro
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
