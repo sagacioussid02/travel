@@ -12,6 +12,7 @@ import {
   CalendarDays,
   Sparkles,
   RefreshCw,
+  LogIn,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,17 @@ import { useToast } from '@/hooks/use-toast';
 import { generateItinerary, reviseItinerary } from '@/app/actions';
 import { ItineraryTable } from './ItineraryTable';
 import type { ItineraryItem } from '@/lib/types';
+import { useAuth } from '@/hooks/use-auth';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../ui/alert-dialog';
 
 const formSchema = z.object({
   city: z.string().min(2, {
@@ -55,6 +67,10 @@ export default function ItineraryGenerator() {
   const [itinerary, setItinerary] = useState<ItineraryItem[] | null>(null);
   const [formValues, setFormValues] = useState<FormData | null>(null);
   const { toast } = useToast();
+  const { user, handleLogin } = useAuth();
+  const [generationCount, setGenerationCount] = useState(0);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -65,6 +81,11 @@ export default function ItineraryGenerator() {
   });
 
   async function onSubmit(values: FormData) {
+    if (!user && generationCount >= 1) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
     setIsLoading(true);
     setItinerary(null);
     setFormValues(values);
@@ -73,6 +94,9 @@ export default function ItineraryGenerator() {
 
     if (result.success) {
       setItinerary(result.data);
+      if (!user) {
+        setGenerationCount(prev => prev + 1);
+      }
     } else {
       toast({
         variant: 'destructive',
@@ -243,6 +267,27 @@ export default function ItineraryGenerator() {
           </Card>
         )}
       </div>
+
+       <AlertDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Login to Continue</AlertDialogTitle>
+            <AlertDialogDescription>
+              You've used your free itinerary generation. Please log in to create unlimited travel plans.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={async () => {
+                await handleLogin();
+                setShowLoginPrompt(false);
+            }}>
+              <LogIn className="mr-2" />
+              Login
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
