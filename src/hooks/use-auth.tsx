@@ -41,10 +41,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (currentUser) {
         // Check for pro status in Firestore when user logs in
         const userDocRef = doc(db, 'users', currentUser.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists() && userDoc.data().isPro) {
-            setIsPro(true);
-        } else {
+        try {
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists() && userDoc.data().isPro) {
+              setIsPro(true);
+          } else {
+              setIsPro(false);
+          }
+        } catch (e) {
+            console.error("Error fetching user's pro status", e);
             setIsPro(false);
         }
       } else {
