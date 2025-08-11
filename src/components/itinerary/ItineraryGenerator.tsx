@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -46,8 +47,7 @@ import { useToast } from '@/hooks/use-toast';
 import { generateItinerary, reviseItinerary } from '@/app/actions';
 import { ItineraryTable } from './ItineraryTable';
 import type { ItineraryItem } from '@/lib/types';
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
-import { app } from '@/lib/firebase';
+import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
@@ -73,52 +73,44 @@ export default function ItineraryGenerator() {
   const [generationCount, setGenerationCount] = useState(0);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [showPaymentPrompt, setShowPaymentPrompt] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { user, handleLogin } = useAuth();
   const { toast } = useToast();
-  const auth = getAuth(app);
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
+    let key;
+    let isGuest = true;
+    if (user) {
+        key = `${USER_GENERATION_INFO_KEY}_${user.uid}`;
+        isGuest = false;
         setShowLoginPrompt(false);
-        // Load generation count for the logged-in user
-        const storedInfoRaw = localStorage.getItem(`${USER_GENERATION_INFO_KEY}_${currentUser.uid}`);
-        if (storedInfoRaw) {
-          try {
+    } else {
+        key = GUEST_GENERATION_INFO_KEY;
+    }
+    
+    const storedInfoRaw = localStorage.getItem(key);
+
+    if (storedInfoRaw) {
+        try {
             const storedInfo = JSON.parse(storedInfoRaw);
-            setGenerationCount(storedInfo.count);
-          } catch {
-            localStorage.removeItem(`${USER_GENERATION_INFO_KEY}_${currentUser.uid}`);
-          }
-        } else {
-            setGenerationCount(0);
-        }
-      } else {
-        // Load generation count for guest
-        const storedInfoRaw = localStorage.getItem(GUEST_GENERATION_INFO_KEY);
-        if (storedInfoRaw) {
-            try {
-                const storedInfo = JSON.parse(storedInfoRaw);
-                const { count, timestamp } = storedInfo;
-                const now = Date.now();
-                if (now - timestamp > TWELVE_HOURS_IN_MS) {
-                    localStorage.removeItem(GUEST_GENERATION_INFO_KEY);
-                    setGenerationCount(0);
-                } else {
-                    setGenerationCount(count);
-                }
-            } catch {
-                localStorage.removeItem(GUEST_GENERATION_INFO_KEY);
+            let count = storedInfo.count;
+            if (isGuest) {
+                 const { timestamp } = storedInfo;
+                 if (Date.now() - timestamp > TWELVE_HOURS_IN_MS) {
+                    localStorage.removeItem(key);
+                    count = 0;
+                 }
             }
-        } else {
+            setGenerationCount(count);
+        } catch {
+            localStorage.removeItem(key);
             setGenerationCount(0);
         }
-      }
-    });
-    return () => unsubscribe();
-  }, [auth]);
+    } else {
+        setGenerationCount(0);
+    }
+
+  }, [user]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -351,7 +343,7 @@ export default function ItineraryGenerator() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => router.push('/')}>Login</AlertDialogAction>
+            <AlertDialogAction onClick={handleLogin}>Login</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

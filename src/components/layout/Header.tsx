@@ -2,16 +2,6 @@
 'use client';
 
 import { PaperPlaneIcon } from './PaperPlaneIcon';
-import { useEffect, useState } from 'react';
-import {
-  getAuth,
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-  User,
-  signOut,
-} from 'firebase/auth';
-import { app } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -24,37 +14,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LogOut, Package } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
 
 export function Header() {
-  const [user, setUser] = useState<User | null>(null);
-  const auth = getAuth(app);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, [auth]);
-
-  const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error: any) {
-      // This error occurs when the user closes the popup. It's a normal user action.
-      if (error.code !== 'auth/cancelled-popup-request') {
-        console.error('Error during sign-in:', error);
-      }
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error('Error during sign-out:', error);
-    }
-  };
+  const { user, handleLogin, handleLogout } = useAuth();
 
   return (
     <header className="py-2 px-4 sm:px-6 lg:px-8 border-b sticky top-0 bg-background/80 backdrop-blur-sm z-10">
