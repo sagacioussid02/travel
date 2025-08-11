@@ -48,7 +48,7 @@ import { ItineraryTable } from './ItineraryTable';
 import type { ItineraryItem } from '@/lib/types';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { app } from '@/lib/firebase';
-import { Header } from '../layout/Header';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   city: z.string().min(2, {
@@ -76,6 +76,7 @@ export default function ItineraryGenerator() {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   const auth = getAuth(app);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -195,6 +196,10 @@ export default function ItineraryGenerator() {
       });
     }
     setIsRevising(false);
+  }
+
+  const handleProceedToPayment = () => {
+    router.push('/payment');
   }
 
   return (
@@ -337,20 +342,18 @@ export default function ItineraryGenerator() {
       </div>
 
       <AlertDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
-          <AlertDialogContent>
-              <AlertDialogHeader>
-                  <AlertDialogTitle>Login to Continue</AlertDialogTitle>
-                  <AlertDialogDescription>
-                      You have used your free itinerary generation. Please log in to continue creating amazing travel plans with Sidoni.
-                  </AlertDialogDescription>
-              </AlertDialogHeader>
-              <div className="flex justify-center py-4">
-                <Header />
-              </div>
-              <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-              </AlertDialogFooter>
-          </AlertDialogContent>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+              <AlertDialogTitle>Login to Continue</AlertDialogTitle>
+              <AlertDialogDescription>
+                  You have used your free itinerary generation. Please log in to continue creating amazing travel plans with Sidoni.
+              </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => router.push('/')}>Login</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
       </AlertDialog>
 
       <AlertDialog open={showPaymentPrompt} onOpenChange={setShowPaymentPrompt}>
@@ -363,7 +366,7 @@ export default function ItineraryGenerator() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction>
+                  <AlertDialogAction onClick={handleProceedToPayment}>
                     <CreditCard className="mr-2 h-4 w-4" />
                     Proceed to Payment
                   </AlertDialogAction>
