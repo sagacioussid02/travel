@@ -7,7 +7,6 @@ import {
   useEffect,
   useState,
   ReactNode,
-  useCallback,
 } from 'react';
 import {
   getAuth,
@@ -18,7 +17,7 @@ import {
   User,
 } from 'firebase/auth';
 import { app, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 
 
 interface AuthContextType {
@@ -26,7 +25,6 @@ interface AuthContextType {
   isPro: boolean;
   handleLogin: () => Promise<void>;
   handleLogout: () => Promise<void>;
-  setUserAsPro: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -75,17 +73,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Error during sign-out:', error);
     }
   };
-  
-  const setUserAsPro = useCallback(async () => {
-    if (user) {
-        const userDocRef = doc(db, 'users', user.uid);
-        await setDoc(userDocRef, { isPro: true }, { merge: true });
-        setIsPro(true);
-    }
-  }, [user]);
 
   return (
-    <AuthContext.Provider value={{ user, isPro, handleLogin, handleLogout, setUserAsPro }}>
+    <AuthContext.Provider value={{ user, isPro, handleLogin, handleLogout }}>
       {children}
     </AuthContext.Provider>
   );

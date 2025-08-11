@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { CreditCard, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
+import { grantProAccess } from '../actions';
 
 export default function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
-  const { user, setUserAsPro } = useAuth();
+  const { user } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,7 +49,16 @@ export default function CheckoutForm() {
         }
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         if (user) {
-            await setUserAsPro();
+            const result = await grantProAccess();
+            if (!result.success) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Update Failed',
+                    description: 'Your payment was successful, but we failed to update your account. Please contact support.',
+                });
+                setIsLoading(false);
+                return;
+            }
         }
         toast({
             title: 'Payment Successful!',
