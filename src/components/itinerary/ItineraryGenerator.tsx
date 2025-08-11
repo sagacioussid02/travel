@@ -73,11 +73,16 @@ export default function ItineraryGenerator() {
   const [generationCount, setGenerationCount] = useState(0);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [showPaymentPrompt, setShowPaymentPrompt] = useState(false);
-  const { user, handleLogin } = useAuth();
+  const { user, handleLogin, isPro } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
+    if (isPro) {
+      setGenerationCount(0); // Pro users have unlimited generations
+      return;
+    }
+
     let key;
     let isGuest = true;
     if (user) {
@@ -110,7 +115,7 @@ export default function ItineraryGenerator() {
         setGenerationCount(0);
     }
 
-  }, [user]);
+  }, [user, isPro]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -121,7 +126,9 @@ export default function ItineraryGenerator() {
   });
 
   async function onSubmit(values: FormData) {
-    if (user) {
+    if (isPro) {
+        // Pro users can generate freely
+    } else if (user) {
         if (generationCount >= 1) {
             setShowPaymentPrompt(true);
             return;
@@ -137,18 +144,20 @@ export default function ItineraryGenerator() {
     setItinerary(null);
     setFormValues(values);
     
-    const newCount = generationCount + 1;
-    setGenerationCount(newCount);
+    if (!isPro) {
+      const newCount = generationCount + 1;
+      setGenerationCount(newCount);
 
-    if (user) {
-        const userInfo = { count: newCount };
-        localStorage.setItem(`${USER_GENERATION_INFO_KEY}_${user.uid}`, JSON.stringify(userInfo));
-    } else {
-        const guestInfo = {
-            count: newCount,
-            timestamp: Date.now(),
-        };
-        localStorage.setItem(GUEST_GENERATION_INFO_KEY, JSON.stringify(guestInfo));
+      if (user) {
+          const userInfo = { count: newCount };
+          localStorage.setItem(`${USER_GENERATION_INFO_KEY}_${user.uid}`, JSON.stringify(userInfo));
+      } else {
+          const guestInfo = {
+              count: newCount,
+              timestamp: Date.now(),
+          };
+          localStorage.setItem(GUEST_GENERATION_INFO_KEY, JSON.stringify(guestInfo));
+      }
     }
 
     const result = await generateItinerary(values);
@@ -265,9 +274,16 @@ export default function ItineraryGenerator() {
                       'Generate Itinerary'
                     )}
                   </Button>
-                    <p className="text-sm text-muted-foreground">
-                      {generationCount} / 1 Free Generation Used
-                    </p>
+                    {!isPro && (
+                      <p className="text-sm text-muted-foreground">
+                        {generationCount} / 1 Free Generation Used
+                      </p>
+                    )}
+                     {isPro && (
+                        <p className="text-sm text-primary font-medium">
+                            Unlimited Generations Enabled
+                        </p>
+                    )}
                 </div>
               </form>
             </Form>

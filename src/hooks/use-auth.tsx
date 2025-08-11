@@ -7,6 +7,7 @@ import {
   useEffect,
   useState,
   ReactNode,
+  useCallback,
 } from 'react';
 import {
   getAuth,
@@ -18,10 +19,14 @@ import {
 } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 
+const PRO_STATUS_KEY_PREFIX = 'pro_status_';
+
 interface AuthContextType {
   user: User | null;
+  isPro: boolean;
   handleLogin: () => Promise<void>;
   handleLogout: () => Promise<void>;
+  setUserAsPro: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,10 +35,19 @@ const auth = getAuth(app);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isPro, setIsPro] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        // Check for pro status in localStorage when user logs in
+        const proStatus = localStorage.getItem(`${PRO_STATUS_KEY_PREFIX}${currentUser.uid}`);
+        setIsPro(proStatus === 'true');
+      } else {
+        // Reset pro status on logout
+        setIsPro(false);
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -56,9 +70,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Error during sign-out:', error);
     }
   };
+  
+  const setUserAsPro = useCallback(() => {
+    if (user) {
+        localStorage.setItem(`${PRO_STATUS_KEY_PREFIX}${user.uid}`, 'true');
+        setIsPro(true);
+    }
+  }, [user]);
 
   return (
-    <AuthContext.Provider value={{ user, handleLogin, handleLogout }}>
+    <AuthContext.Provider value={{ user, isPro, handleLogin, handleLogout, setUserAsPro }}>
       {children}
     </AuthContext.Provider>
   );

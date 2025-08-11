@@ -6,11 +6,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { CreditCard, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
+  const { user, setUserAsPro } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,11 +28,7 @@ export default function CheckoutForm() {
 
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
-      confirmParams: {
-        // Make sure to change this to your payment completion page
-        return_url: `${window.location.origin}/`,
-      },
-      redirect: 'if_required', // This prevents the automatic redirect
+      redirect: 'if_required', 
     });
 
 
@@ -49,6 +47,9 @@ export default function CheckoutForm() {
           });
         }
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        if (user) {
+            setUserAsPro();
+        }
         toast({
             title: 'Payment Successful!',
             description: 'You now have unlimited access.',
