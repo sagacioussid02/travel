@@ -50,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } catch (e) {
             console.error("Error fetching user's pro status", e);
+            // If there's an error (e.g., offline), assume not pro as a safe default
             setIsPro(false);
         }
       } else {
