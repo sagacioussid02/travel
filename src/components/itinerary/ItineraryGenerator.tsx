@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,7 +12,6 @@ import {
   CalendarDays,
   Sparkles,
   RefreshCw,
-  CreditCard,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -33,22 +32,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { generateItinerary, reviseItinerary } from '@/app/actions';
 import { ItineraryTable } from './ItineraryTable';
 import type { ItineraryItem } from '@/lib/types';
-import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   city: z.string().min(2, {
@@ -61,61 +48,13 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
-const GUEST_GENERATION_INFO_KEY = 'guestGenerationInfo';
-const USER_GENERATION_INFO_KEY = 'userGenerationInfo';
-const TWELVE_HOURS_IN_MS = 12 * 60 * 60 * 1000;
 
 export default function ItineraryGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRevising, setIsRevising] = useState(false);
   const [itinerary, setItinerary] = useState<ItineraryItem[] | null>(null);
   const [formValues, setFormValues] = useState<FormData | null>(null);
-  const [generationCount, setGenerationCount] = useState(0);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [showPaymentPrompt, setShowPaymentPrompt] = useState(false);
-  const { user, handleLogin, isPro } = useAuth();
   const { toast } = useToast();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (isPro) {
-      setGenerationCount(0); // Pro users have unlimited generations
-      return;
-    }
-
-    let key;
-    let isGuest = true;
-    if (user) {
-        key = `${USER_GENERATION_INFO_KEY}_${user.uid}`;
-        isGuest = false;
-        setShowLoginPrompt(false);
-    } else {
-        key = GUEST_GENERATION_INFO_KEY;
-    }
-    
-    const storedInfoRaw = localStorage.getItem(key);
-
-    if (storedInfoRaw) {
-        try {
-            const storedInfo = JSON.parse(storedInfoRaw);
-            let count = storedInfo.count;
-            if (isGuest) {
-                 const { timestamp } = storedInfo;
-                 if (Date.now() - timestamp > TWELVE_HOURS_IN_MS) {
-                    localStorage.removeItem(key);
-                    count = 0;
-                 }
-            }
-            setGenerationCount(count);
-        } catch {
-            localStorage.removeItem(key);
-            setGenerationCount(0);
-        }
-    } else {
-        setGenerationCount(0);
-    }
-
-  }, [user, isPro]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -126,40 +65,10 @@ export default function ItineraryGenerator() {
   });
 
   async function onSubmit(values: FormData) {
-    if (isPro) {
-        // Pro users can generate freely
-    } else if (user) {
-        if (generationCount >= 1) {
-            setShowPaymentPrompt(true);
-            return;
-        }
-    } else {
-        if (generationCount >= 1) {
-            setShowLoginPrompt(true);
-            return;
-        }
-    }
-
     setIsLoading(true);
     setItinerary(null);
     setFormValues(values);
     
-    if (!isPro) {
-      const newCount = generationCount + 1;
-      setGenerationCount(newCount);
-
-      if (user) {
-          const userInfo = { count: newCount };
-          localStorage.setItem(`${USER_GENERATION_INFO_KEY}_${user.uid}`, JSON.stringify(userInfo));
-      } else {
-          const guestInfo = {
-              count: newCount,
-              timestamp: Date.now(),
-          };
-          localStorage.setItem(GUEST_GENERATION_INFO_KEY, JSON.stringify(guestInfo));
-      }
-    }
-
     const result = await generateItinerary(values);
 
     if (result.success) {
@@ -197,10 +106,6 @@ export default function ItineraryGenerator() {
       });
     }
     setIsRevising(false);
-  }
-
-  const handleProceedToPayment = () => {
-    router.push('/payment');
   }
 
   return (
@@ -274,16 +179,6 @@ export default function ItineraryGenerator() {
                       'Generate Itinerary'
                     )}
                   </Button>
-                    {!isPro && (
-                      <p className="text-sm text-muted-foreground">
-                        {generationCount} / 1 Free Generation Used
-                      </p>
-                    )}
-                     {isPro && (
-                        <p className="text-sm text-primary font-medium">
-                            Unlimited Generations Enabled
-                        </p>
-                    )}
                 </div>
               </form>
             </Form>
@@ -348,39 +243,6 @@ export default function ItineraryGenerator() {
           </Card>
         )}
       </div>
-
-      <AlertDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-              <AlertDialogTitle>Login to Continue</AlertDialogTitle>
-              <AlertDialogDescription>
-                  You have used your free itinerary generation. Please log in to continue creating amazing travel plans with Sidoni.
-              </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleLogin}>Login</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={showPaymentPrompt} onOpenChange={setShowPaymentPrompt}>
-          <AlertDialogContent>
-              <AlertDialogHeader>
-                  <AlertDialogTitle>Limit Reached</AlertDialogTitle>
-                  <AlertDialogDescription>
-                      You have used your itinerary generation for this session. Please purchase for unlimited access.
-                  </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleProceedToPayment}>
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Proceed to Payment
-                  </AlertDialogAction>
-              </AlertDialogFooter>
-          </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }

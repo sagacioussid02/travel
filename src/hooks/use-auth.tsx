@@ -16,13 +16,11 @@ import {
   GoogleAuthProvider,
   User,
 } from 'firebase/auth';
-import { app, db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
 
 
 interface AuthContextType {
   user: User | null;
-  isPro: boolean;
   handleLogin: () => Promise<void>;
   handleLogout: () => Promise<void>;
 }
@@ -33,30 +31,10 @@ const auth = getAuth(app);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isPro, setIsPro] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (currentUser) {
-        // Check for pro status in Firestore when user logs in
-        const userDocRef = doc(db, 'users', currentUser.uid);
-        try {
-          const userDoc = await getDoc(userDocRef);
-          if (userDoc.exists() && userDoc.data().isPro) {
-              setIsPro(true);
-          } else {
-              setIsPro(false);
-          }
-        } catch (e) {
-            console.error("Error fetching user's pro status, possibly due to offline client. Defaulting to non-pro.", e);
-            // If there's an error (e.g., offline), assume not pro as a safe default
-            setIsPro(false);
-        }
-      } else {
-        // Reset pro status on logout
-        setIsPro(false);
-      }
     });
     return () => unsubscribe();
   }, []);
@@ -81,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isPro, handleLogin, handleLogout }}>
+    <AuthContext.Provider value={{ user, handleLogin, handleLogout }}>
       {children}
     </AuthContext.Provider>
   );

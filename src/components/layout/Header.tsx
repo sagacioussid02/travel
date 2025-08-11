@@ -12,12 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, Package, Star } from 'lucide-react';
+import { LogOut, Package } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 
 export function Header() {
-  const { user, handleLogin, handleLogout, isPro } = useAuth();
+  const { user, handleLogin, handleLogout } = useAuth();
 
   return (
     <header className="py-2 px-4 sm:px-6 lg:px-8 border-b sticky top-0 bg-background/80 backdrop-blur-sm z-10">
@@ -40,6 +40,11 @@ export function Header() {
               Travel Toolkit
             </Button>
           </Link>
+          <Link href="/payment" passHref>
+            <Button>
+              Go Pro
+            </Button>
+          </Link>
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -57,7 +62,6 @@ export function Header() {
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none flex items-center">
                       {user.displayName}
-                      {isPro && <Star className="w-4 h-4 ml-2 text-yellow-500 fill-yellow-500" />}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                   </div>

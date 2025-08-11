@@ -1,99 +1,64 @@
 
 'use client';
 
-import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { CreditCard, Loader2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
-import { grantProAccess } from '../actions';
+import { CreditCard, Instagram, Send } from 'lucide-react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import Link from 'next/link';
 
 export default function CheckoutForm() {
-  const stripe = useStripe();
-  const elements = useElements();
-  const { toast } = useToast();
-  const { user } = useAuth();
-
-  const [isLoading, setIsLoading] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!stripe || !elements) {
-      // Stripe.js has not yet loaded.
-      return;
-    }
-
-    setIsLoading(true);
-
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      redirect: 'if_required', 
-    });
-
-
-    if (error) {
-       if (error.type === 'card_error' || error.type === 'validation_error') {
-          toast({
-            variant: 'destructive',
-            title: 'Payment Failed',
-            description: error.message || 'An unexpected error occurred.',
-          });
-        } else {
-           toast({
-            variant: 'destructive',
-            title: 'An unexpected error occurred.',
-            description: 'Please try again.',
-          });
-        }
-    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        if (user) {
-            const result = await grantProAccess();
-            if (!result.success) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Update Failed',
-                    description: 'Your payment was successful, but we failed to update your account. Please contact support.',
-                });
-                setIsLoading(false);
-                return;
-            }
-        }
-        toast({
-            title: 'Payment Successful!',
-            description: 'You now have unlimited access.',
-        });
-        // Redirect programmatically after success
-        window.location.href = '/';
-
-    } else {
-         toast({
-            variant: 'destructive',
-            title: 'Payment Status Unknown',
-            description: 'Your payment status is unclear. Please check your account or contact support.',
-        });
-    }
-
-    setIsLoading(false);
+    setShowComingSoon(true);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <PaymentElement id="payment-element" />
-      <Button disabled={isLoading || !stripe || !elements} id="submit" className="w-full mt-6 font-bold" size="lg">
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing...
-          </>
-        ) : (
-          <>
+    <>
+      <form onSubmit={handleSubmit}>
+        <div className="p-4 border rounded-md bg-muted/50 mb-6">
+            <p className="text-center text-sm text-muted-foreground">
+                Live payments are coming soon. The button below will show a confirmation message.
+            </p>
+        </div>
+        <Button id="submit" className="w-full font-bold" size="lg">
             <CreditCard className="mr-2" />
             Pay Securely
-          </>
-        )}
-      </Button>
-    </form>
+        </Button>
+      </form>
+
+      <AlertDialog open={showComingSoon} onOpenChange={setShowComingSoon}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <div className="mx-auto bg-primary/20 p-3 rounded-full w-fit mb-4">
+                    <Send className="w-8 h-8 text-primary" />
+                </div>
+                <AlertDialogTitle className="text-center">Payments Coming Soon!</AlertDialogTitle>
+                <AlertDialogDescription className="text-center">
+                    We are currently setting up our secure payment system. For updates and to get in touch, please visit our Instagram page.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col sm:flex-col sm:space-x-0 gap-2">
+                 <Link href="https://instagram.com/travelwithsidoni" target="_blank" className="w-full">
+                    <AlertDialogAction className="w-full">
+                            <Instagram className="mr-2"/>
+                            Go to Instagram
+                    </AlertDialogAction>
+                </Link>
+                <Button variant="outline" onClick={() => setShowComingSoon(false)}>Close</Button>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

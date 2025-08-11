@@ -9,56 +9,6 @@ import {
   reviseTravelItinerary,
   type ReviseTravelItineraryInput,
 } from '@/ai/flows/revise-travel-itinerary';
-import { db } from '@/lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { app } from '@/lib/firebase';
-import Stripe from 'stripe';
-
-const auth = getAuth(app);
-
-// This is a placeholder for your Stripe secret key.
-// In a real application, use environment variables: process.env.STRIPE_SECRET_KEY
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-06-20',
-});
-
-export async function createPaymentIntent() {
-    try {
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: 1000, // Amount in cents ($10.00)
-            currency: 'usd',
-            automatic_payment_methods: {
-                enabled: true,
-            },
-        });
-        return { success: true, clientSecret: paymentIntent.client_secret };
-    } catch (error) {
-        console.error('Error creating payment intent:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-        return {
-            success: false,
-            error: 'Failed to create payment intent.',
-            details: errorMessage,
-        };
-    }
-}
-
-export async function grantProAccess() {
-    const user = auth.currentUser;
-    if (!user) {
-        return { success: false, error: 'User not authenticated.' };
-    }
-    try {
-        const userDocRef = doc(db, 'users', user.uid);
-        await setDoc(userDocRef, { isPro: true }, { merge: true });
-        return { success: true };
-    } catch (error) {
-        console.error('Error granting pro access:', error);
-        return { success: false, error: 'Failed to update user status in database.' };
-    }
-}
-
 
 export async function generateItinerary(input: TravelItineraryInput) {
   try {
