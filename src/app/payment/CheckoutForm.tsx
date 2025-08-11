@@ -24,26 +24,44 @@ export default function CheckoutForm() {
 
     setIsLoading(true);
 
-    const { error } = await stripe.confirmPayment({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
         return_url: `${window.location.origin}/`,
       },
+      redirect: 'if_required', // This prevents the automatic redirect
     });
 
-    if (error.type === 'card_error' || error.type === 'validation_error') {
-      toast({
-        variant: 'destructive',
-        title: 'Payment Failed',
-        description: error.message || 'An unexpected error occurred.',
-      });
+
+    if (error) {
+       if (error.type === 'card_error' || error.type === 'validation_error') {
+          toast({
+            variant: 'destructive',
+            title: 'Payment Failed',
+            description: error.message || 'An unexpected error occurred.',
+          });
+        } else {
+           toast({
+            variant: 'destructive',
+            title: 'An unexpected error occurred.',
+            description: 'Please try again.',
+          });
+        }
+    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        toast({
+            title: 'Payment Successful!',
+            description: 'You now have unlimited access.',
+        });
+        // Redirect programmatically after success
+        window.location.href = '/';
+
     } else {
-       toast({
-        variant: 'destructive',
-        title: 'An unexpected error occurred.',
-        description: 'Please try again.',
-      });
+         toast({
+            variant: 'destructive',
+            title: 'Payment Status Unknown',
+            description: 'Your payment status is unclear. Please check your account or contact support.',
+        });
     }
 
     setIsLoading(false);
