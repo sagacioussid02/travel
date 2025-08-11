@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PaperPlaneIcon } from './PaperPlaneIcon';
@@ -39,8 +40,11 @@ export function Header() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error('Error during sign-in:', error);
+    } catch (error: any) {
+      // This error occurs when the user closes the popup. It's a normal user action.
+      if (error.code !== 'auth/cancelled-popup-request') {
+        console.error('Error during sign-in:', error);
+      }
     }
   };
 
