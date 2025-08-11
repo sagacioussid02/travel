@@ -56,7 +56,7 @@ const formSchema = z.object({
   numberOfDays: z.coerce
     .number()
     .min(1, { message: 'Duration must be at least 1 day.' })
-    .max(14, { message: 'Duration cannot exceed 14 days.' }),
+    .max(5, { message: 'Duration cannot exceed 5 days.' }),
 });
 
 type FormData = z.infer<typeof formSchema>;
